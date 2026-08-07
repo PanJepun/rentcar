@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>ADMIN KATALOG - RENT CAR</title>
+    <style>
+        *{margin:0; padding:0; box-sizing:border-box; font-family:Arial;}
+        body{background:#f5f5f5;}
+       .navbar{background:#1a1a1a; color:#fff; padding:15px 30px;}
+       .navbar a{color:#ffc107; text-decoration:none; margin-left:20px;}
+       .container{max-width:1200px; margin:20px auto; padding:20px;}
+        
+       .form-box{background:#fff; padding:20px; border-radius:10px; margin-bottom:30px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+       .form-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px;}
+        input, select{width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;}
+       .btn{background:#ffc107; color:#000; padding:12px 25px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;}
+       .btn-danger{background:#dc3545; color:#fff;}
+       .btn-sm{padding:6px 10px; font-size:13px;}
+
+        /* FIX 1: GAMBAR BISA FULL TANPA KE POTONG */
+       .grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;}
+       .card{background:#fff; border-radius:10px; padding:0; box-shadow:0 2px 5px rgba(0,0,0,0.1); overflow:hidden;}
+       .card img{width:100%; height:auto; aspect-ratio:16/9; object-fit:cover; display:block;} /* ini kunci nya */
+       .card-body{padding:15px;}
+       .preview-img{width:100px; height:60px; object-fit:cover; margin-top:5px; border-radius:5px;}
+       .harga{color:#d32f2f; font-weight:bold;}
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <b>⚙️ ADMIN KATALOG</b>
+        <a href="index.html">Lihat Website</a>
+    </div>
+
+    <div class="container">
+        <h2>1. Form Tambah / Edit Mobil</h2>
+        <div class="form-box">
+            <input type="hidden" id="idEdit">
+            <div class="form-grid">
+                <input type="text" id="nama" placeholder="Nama Mobil: Alphard 2012" required>
+                <div>
+                    <label>Upload Gambar</label>
+                    <input type="file" id="gambarFile" accept="image/*" onchange="previewGambar(event)" required>
+                    <input type="hidden" id="gambar"> 
+                    <img id="preview" class="preview-img">
+                </div>
+                <input type="number" id="tahun" placeholder="Tahun: 2012" required>
+                <select id="transmisi"><option value="Matic">Matic</option><option value="Manual">Manual</option></select>
+                <input type="number" id="kursi" placeholder="Jumlah Kursi: 6" required>
+                <select id="status"><option>Tersedia</option><option>Disewa</option></select>
+                <input type="number" id="hargaLepas" placeholder="Harga Lepas Kunci/hari" required>
+                <input type="number" id="hargaDriver" placeholder="Harga + Driver/hari" required>
+                <input type="text" id="fitur" placeholder="Fitur: AC, Audio">
+            </div>
+            <br>
+            <label><input type="checkbox" id="promo"> Tampilkan di Slider Beranda</label>
+            <br><br>
+            <button class="btn" onclick="simpanMobil()">Simpan Data</button>
+        </div>
+
+        <h2>2. Data Mobil di Katalog</h2>
+        <div class="grid" id="listMobil"></div>
+    </div>
+
+<script>
+let dataMobil = JSON.parse(localStorage.getItem('dataMobil')) || [];
+
+function previewGambar(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+        document.getElementById('gambar').value = e.target.result;
+        document.getElementById('preview').src = e.target.result;
+    }
+    reader.readAsDataURL(file);
+}
+
+function simpanMobil(){
+    // FIX 2: CEK BIAR GAK UNDEFINED
+    if(!nama.value ||!gambar.value ||!hargaLepas.value ||!hargaDriver.value){
+        alert('Nama, Gambar, Harga Wajib Diisi!');
+        return;
+    }
+    
+    const id = document.getElementById('idEdit').value;
+    const mobil = {
+        id: id? parseInt(id) : Date.now(),
+        nama: nama.value, 
+        gambar: gambar.value,
+        tahun: tahun.value, 
+        transmisi: transmisi.value, 
+        kursi: kursi.value, 
+        status: status.value,
+        hargaLepas: parseInt(hargaLepas.value), 
+        hargaDriver: parseInt(hargaDriver.value),
+        fitur: fitur.value, 
+        promo: promo.checked // INI PENTING BIAR MASUK SLIDER
+    };
+    if(id){ dataMobil = dataMobil.map(m => m.id == id? mobil : m); } 
+    else { dataMobil.push(mobil); }
+    localStorage.setItem('dataMobil', JSON.stringify(dataMobil));
+    resetForm(); tampilkanMobil(); alert("Data tersimpan! Buka index.html untuk liat slider");
+}
+
+function tampilkanMobil(){
+    listMobil.innerHTML = '';
+    dataMobil.forEach(mobil => {
+        listMobil.innerHTML += `
+        <div class="card">
+            <img src="${mobil.gambar}" alt="${mobil.nama}">
+            <div class="card-body">
+                <h3>${mobil.nama}</h3>
+                <p>🚗 ${mobil.transmisi} | 👥 ${mobil.kursi} Kursi | ${mobil.status}</p>
+                <p class="harga">Lepas: Rp ${mobil.hargaLepas?.toLocaleString()}/hari</p>
+                <p class="harga">Driver: Rp ${mobil.hargaDriver?.toLocaleString()}/hari</p>
+                <p>Slider: ${mobil.promo? '✅ Ya' : '❌ Tidak'}</p>
+                <button class="btn btn-sm" onclick="editMobil(${mobil.id})">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="hapusMobil(${mobil.id})">Hapus</button>
+            </div>
+        </div>`;
+    });
+}
+
+function editMobil(id){
+    const m = dataMobil.find(x => x.id === id);
+    idEdit.value=m.id; nama.value=m.nama; tahun.value=m.tahun; transmisi.value=m.transmisi;
+    kursi.value=m.kursi; status.value=m.status; hargaLepas.value=m.hargaLepas;
+    hargaDriver.value=m.hargaDriver; fitur.value=m.fitur; promo.checked=m.promo;
+    gambar.value=m.gambar; preview.src=m.gambar;
+    window.scrollTo(0,0);
+}
+
+function hapusMobil(id){
+    if(confirm('Hapus?')){ dataMobil = dataMobil.filter(m => m.id!== id); localStorage.setItem('dataMobil', JSON.stringify(dataMobil)); tampilkanMobil(); }
+}
+
+function resetForm(){ 
+    idEdit.value=''; 
+    document.querySelectorAll('input[type=text], input[type=number]').forEach(i => i.value = ''); 
+    preview.src = ''; gambarFile.value = ''; promo.checked=false; 
+}
+tampilkanMobil();
+</script>
+</body>
+</html>

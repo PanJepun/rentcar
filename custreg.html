@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DATA CUSTOMER REGULER</title>
+<style>
+body { font-family: 'Segoe UI', Arial; background: #0a1629; margin: 0; padding: 15px; color: #333; }
+h2 { text-align: center; color: #d4af37; font-size: 20px; margin: 5px 0 15px 0; font-weight: bold; }
+.box { background: white; border: 2px solid #d4af37; border-radius: 8px; padding: 20px; max-width: 1400px; margin: auto; }
+.btn-tambah { background:#28a745; color:white; border:none; padding:10px 15px; border-radius:4px; cursor:pointer; font-weight:bold; margin-bottom:15px; }
+.tabel { width:100%; border-collapse:collapse; font-size:12px; }
+.tabel th { background:#d4af37; color:#000; padding:8px; text-align:center; }
+.tabel td { border:1px solid #ddd; padding:6px; text-align:center; }
+.tabel td.kiri { text-align:left; }
+.tabel td.kanan { text-align:right; font-weight:bold; }
+.tabel tr:nth-child(even){ background:#f9f9f9; }
+.btn-aksi { padding:4px 8px; border:none; border-radius:3px; cursor:pointer; font-size:11px; margin:0 2px; }
+.btn-edit { background:#ffc107; color:#000; }
+.btn-hapus { background:#dc3545; color:#fff; }
+.badge-aktif { background:#28a745; color:white; padding:2px 6px; border-radius:3px; font-size:10px; }
+.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+.modal-content { background: #e8f5c8; margin: 5% auto; padding: 20px; border-radius: 8px; width: 60%; max-width: 700px; border: 2px solid #d4af37; }
+.close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+.form-customer { display: grid; grid-template-columns: 130px 1fr; gap: 10px 15px; align-items: center; }
+.btn-simpan-cus { background:#007bff; color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<h2>DATA CUSTOMER REGULER</h2>
+<div class="box">
+    <button class="btn-tambah" onclick="openModalTambah()">+ TAMBAH CUSTOMER REGULER</button>
+
+    <div style="overflow-x:auto;">
+        <table class="tabel">
+            <thead>
+                <tr>
+                    <th>No</th><th>No KTP</th><th>Nama Customer</th><th>No HP</th>
+                    <th>Email</th><th>Alamat</th><th>Pekerjaan</th><th>JK</th>
+                    <th>Jml Sewa</th><th>Total Transaksi</th><th>Status</th><th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyReguler">
+                <tr><td colspan="12">Belum ada data customer reguler</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL FORM -->
+<div id="modalCustReguler" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3 id="judulModal">FORM CUSTOMER REGULER</h3>
+    <form id="formCustReguler" class="form-customer">
+        <input type="hidden" id="id_edit">
+        <label>No. KTP :</label><input type="text" id="reg_ktp" required>
+        <label>Nama Customer :</label><input type="text" id="reg_nama" required>
+        <label>No. HP / WA :</label><input type="text" id="reg_hp" required>
+        <label>Email :</label><input type="email" id="reg_email">
+        <label>Alamat :</label><textarea id="reg_alamat" rows="3" required></textarea>
+        <label>Pekerjaan :</label><input type="text" id="reg_pekerjaan">
+        <label>Jenis Kelamin :</label>
+        <select id="reg_jk" required>
+            <option value="">- Pilih -</option>
+            <option>Laki-laki</option>
+            <option>Perempuan</option>
+        </select>
+        <label>Status :</label>
+        <select id="reg_status">
+            <option value="Aktif">Aktif</option>
+            <option value="Non-Aktif">Non-Aktif</option>
+        </select>
+        <div style="grid-column:1/3;"><button type="submit" class="btn-simpan-cus">SIMPAN</button></div>
+    </form>
+  </div>
+</div>
+
+<script>
+let dataCustomerReguler = JSON.parse(localStorage.getItem('dataCustomerReguler')) || [];
+let dataTransaksi = JSON.parse(localStorage.getItem('dataTransaksi')) || []; // AMBIL DATA TRANSAKSI
+let idEdit = null;
+
+function loadTabelReguler(){
+    let tbody = document.getElementById('tbodyReguler');
+    if(dataCustomerReguler.length == 0){
+        tbody.innerHTML = '<tr><td colspan="12">Belum ada data customer reguler</td></tr>';
+        return;
+    }
+    tbody.innerHTML = '';
+    dataCustomerReguler.forEach((c, i) => {
+        // HITUNG TOTAL SEWA & TOTAL BAYAR PER CUSTOMER
+        let transaksiCus = dataTransaksi.filter(t => t.id_customer == c.id && t.tipe_customer == 'reguler');
+        let jmlSewa = transaksiCus.length;
+        let totalTransaksi = transaksiCus.reduce((sum, t) => sum + parseInt(t.total_bayar || 0), 0);
+
+        let statusBadge = c.status_customer == 'Aktif'
+          ? '<span class="badge-aktif">AKTIF</span>'
+            : '<span style="background:#dc3545; color:white; padding:2px 6px; border-radius:3px;">NON-AKTIF</span>';
+
+        tbody.innerHTML += `<tr>
+            <td>${i+1}</td>
+            <td>${c.no_ktp}</td>
+            <td class="kiri">${c.nama_customer}</td>
+            <td>${c.no_hp}</td>
+            <td class="kiri">${c.email || '-'}</td>
+            <td class="kiri">${c.alamat}</td>
+            <td>${c.pekerjaan || '-'}</td>
+            <td>${c.jenis_kelamin}</td>
+            <td>${jmlSewa} x</td>
+            <td class="kanan">Rp ${totalTransaksi.toLocaleString('id-ID')}</td>
+            <td>${statusBadge}</td>
+            <td>
+                <button class="btn-aksi btn-edit" onclick="editReguler(${c.id})">Edit</button>
+                <button class="btn-aksi btn-hapus" onclick="hapusReguler(${c.id})">Hapus</button>
+            </td>
+        </tr>`;
+    });
+}
+
+function openModalTambah(){
+    idEdit = null;
+    document.getElementById('judulModal').innerText = 'FORM CUSTOMER REGULER - TAMBAH';
+    document.getElementById('formCustReguler').reset();
+    document.getElementById('modalCustReguler').style.display = 'block';
+}
+
+function closeModal(){
+    document.getElementById('modalCustReguler').style.display = 'none';
+}
+
+function editReguler(id){
+    idEdit = id;
+    let c = dataCustomerReguler.find(x=>x.id==id);
+    if(!c) return;
+
+    document.getElementById('judulModal').innerText = 'FORM CUSTOMER REGULER - EDIT';
+    id_edit.value = c.id;
+    reg_ktp.value = c.no_ktp;
+    reg_nama.value = c.nama_customer;
+    reg_hp.value = c.no_hp;
+    reg_email.value = c.email;
+    reg_alamat.value = c.alamat;
+    reg_pekerjaan.value = c.pekerjaan;
+    reg_jk.value = c.jenis_kelamin;
+    reg_status.value = c.status_customer;
+
+    document.getElementById('modalCustReguler').style.display = 'block';
+}
+
+function hapusReguler(id){
+    if(confirm('Yakin mau hapus data customer ini?')){
+        dataCustomerReguler = dataCustomerReguler.filter(x=>x.id!=id);
+        localStorage.setItem('dataCustomerReguler', JSON.stringify(dataCustomerReguler));
+        alert('✅ Data dihapus');
+        loadTabelReguler();
+    }
+}
+
+document.getElementById('formCustReguler').addEventListener('submit', function(e){
+    e.preventDefault();
+
+    let data = {
+        id: idEdit || Date.now(),
+        no_ktp: reg_ktp.value,
+        nama_customer: reg_nama.value,
+        no_hp: reg_hp.value,
+        email: reg_email.value,
+        alamat: reg_alamat.value,
+        pekerjaan: reg_pekerjaan.value,
+        jenis_kelamin: reg_jk.value,
+        status_customer: reg_status.value
+    };
+
+    if(idEdit){ // UPDATE
+        let index = dataCustomerReguler.findIndex(x=>x.id==idEdit);
+        dataCustomerReguler[index] = data;
+        alert('✅ Data berhasil diupdate');
+    } else { // TAMBAH BARU
+        dataCustomerReguler.push(data);
+        alert('✅ Data berhasil disimpan');
+    }
+
+    localStorage.setItem('dataCustomerReguler', JSON.stringify(dataCustomerReguler));
+    this.reset();
+    closeModal();
+    loadTabelReguler();
+});
+
+// LOAD PERTAMA KALI
+loadTabelReguler();
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>LAPORAN</title>
+<style>
+body { font-family: 'Segoe UI', Arial; background: #0a1629; margin: 0; padding: 15px; color: #333; }
+h2 { text-align: center; color: #d4af37; font-size: 20px; margin: 5px 0 15px 0; font-weight: bold; }
+.box { background: white; border: 2px solid #d4af37; border-radius: 8px; padding: 20px; max-width: 1400px; margin: auto; }
+.tabs { display:flex; gap:10px; margin-bottom:20px; border-bottom:2px solid #d4af37; }
+.tab-btn { padding:10px 20px; border:none; background:#e9ecef; cursor:pointer; font-weight:bold; border-radius:4px 4px 0 0; }
+.tab-btn.active { background:#d4af37; color:#000; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+.btn-back { background:#6c757d; color:#fff; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold; margin-bottom:10px; }
+.tabel { width:100%; border-collapse:collapse; font-size:11px; }
+.tabel th { background:#d4af37; color:#000; padding:6px; text-align:center; }
+.tabel td { border:1px solid #ddd; padding:5px; text-align:center; }
+.tabel tr:nth-child(even){ background:#f9f9f9; }
+.total-box { background: #dc3545; color: #fff; padding: 12px; border-radius: 4px; text-align: center; font-size: 16px; font-weight: bold; margin-bottom:15px; }
+.badge-belum { background:#dc3545; color:white; padding:3px 8px; border-radius:3px; font-size:10px; font-weight:bold; }
+.badge-lunas { background:#28a745; color:white; padding:3px 8px; border-radius:3px; font-size:10px; font-weight:bold; }
+.btn-bayar { background:#28a745; color:#fff; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:10px; font-weight:bold; margin:0 2px; }
+.btn-cancel { background:#dc3545; color:#fff; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:10px; font-weight:bold; margin:0 2px; }
+</style>
+</head>
+<body>
+
+<h2>MENU LAPORAN</h2>
+<div class="box">
+    <button class="btn-back" onclick="window.location='transaksi.html'">← Kembali</button>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('tab-transaksi')">LAPORAN TRANSAKSI</button>
+        <button class="tab-btn" onclick="openTab('tab-piutang')">LAPORAN PIUTANG</button>
+        <button class="tab-btn" onclick="openTab('tab-pendapatan')">LAPORAN PENDAPATAN</button>
+    </div>
+
+    <!-- TAB 1: TRANSAKSI -->
+    <div id="tab-transaksi" class="tab-content active">
+        <h3>Laporan Semua Transaksi</h3>
+        <table class="tabel" id="tabelTransaksi"></table>
+    </div>
+
+    <!-- TAB 2: PIUTANG -->
+    <div id="tab-piutang" class="tab-content">
+        <h3>Laporan Piutang Customer Kredit</h3>
+        <div class="total-box">TOTAL PIUTANG: Rp <span id="total_piutang">0</span></div>
+        <table class="tabel" id="tabelPiutang"></table>
+    </div>
+
+    <!-- TAB 3: PENDAPATAN -->
+    <div id="tab-pendapatan" class="tab-content">
+        <h3>Laporan Pendapatan</h3>
+        <div class="total-box" style="background:#28a745;">TOTAL PENDAPATAN: Rp <span id="total_pendapatan">0</span></div>
+        <table class="tabel" id="tabelPendapatan"></table>
+    </div>
+</div>
+
+<!-- MODAL BAYAR -->
+<div id="modalBayar" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7);">
+  <div style="background:#fff; margin:10% auto; padding:20px; border-radius:8px; width:40%; border:2px solid #d4af37;">
+    <span style="float:right; font-size:24px; cursor:pointer;" onclick="modalBayar.style.display='none'">&times;</span>
+    <h3>BAYAR PIUTANG</h3>
+    <form id="formBayar">
+        <label>No Invoice :</label><input type="text" id="bayar_invoice" readonly style="width:100%; padding:6px; margin-bottom:10px;">
+        <label>Sisa Piutang :</label><input type="text" id="bayar_sisa" readonly style="width:100%; padding:6px; margin-bottom:10px;">
+        <label>Bayar :</label><input type="number" id="bayar_nominal" placeholder="0" required style="width:100%; padding:6px; margin-bottom:10px;">
+        <button type="submit" style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-weight:bold;">SIMPAN PEMBAYARAN</button>
+    </form>
+  </div>
+</div>
+
+<script>
+let dataCustomer = JSON.parse(localStorage.getItem('dataCustomer')) || [];
+let dataCustomerReguler = JSON.parse(localStorage.getItem('dataCustomerReguler')) || [];
+let dataMobil = JSON.parse(localStorage.getItem('dataMobil')) || [];
+let dataTransaksi = JSON.parse(localStorage.getItem('dataTransaksi')) || [];
+let idBayar = null;
+
+function openTab(id){
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+    loadData();
+}
+
+function loadData(){
+    loadTransaksi();
+    loadPiutang();
+    loadPendapatan();
+}
+
+function loadTransaksi(){
+    let html = `<thead><tr><th>No</th><th>Invoice</th><th>Customer</th><th>Mobil</th><th>Sewa</th><th>Total</th><th>Status</th></tr></thead><tbody>`;
+    dataTransaksi.forEach((t,i)=>{
+        let cus = dataCustomer.find(c=>c.id==t.id_customer) || dataCustomerReguler.find(c=>c.id==t.id_customer);
+        let mob = dataMobil.find(m=>m.id==t.id_mobil);
+        html += `<tr><td>${i+1}</td><td>${t.no_invoice}</td><td>${cus?.nama_customer}</td><td>${mob?.plat}</td><td>${t.tgl_sewa}</td><td>Rp ${parseInt(t.total_bayar).toLocaleString('id-ID')}</td><td>${t.status_bayar}</td></tr>`;
+    });
+    tabelTransaksi.innerHTML = html + `</tbody>`;
+}
+
+function loadPiutang(){
+    // Tampilkan semua kredit, mau lunas atau belum
+    let piutangData = dataTransaksi.filter(t => t.tipe_customer == 'kredit');
+    let html = `<thead><tr><th>No</th><th>Invoice</th><th>Customer</th><th>Total</th><th>Deposit</th><th>Sisa</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+    let total = 0;
+    
+    piutangData.forEach((t,i)=>{
+        let cus = dataCustomer.find(c=>c.id==t.id_customer);
+        let sisa = parseInt(t.sisa_piutang) || (parseInt(t.total_bayar) - parseInt(t.deposit || 0));
+        if(sisa > 0) total += sisa;
+        
+        let statusBadge = sisa <= 0 ? '<span class="badge-lunas">LUNAS</span>' : '<span class="badge-belum">BELUM LUNAS</span>';
+        let tombolAksi = '';
+        
+        if(sisa > 0){
+            tombolAksi = `<button class="btn-bayar" onclick="bukaBayar(${t.id})">BAYAR</button>`;
+        }
+        tombolAksi += `<button class="btn-cancel" onclick="cancelPiutang(${t.id})">CANCEL</button>`;
+
+        html += `<tr>
+            <td>${i+1}</td>
+            <td>${t.no_invoice}</td>
+            <td>${cus?.nama_customer}</td>
+            <td>Rp ${parseInt(t.total_bayar).toLocaleString('id-ID')}</td>
+            <td>Rp ${parseInt(t.deposit || 0).toLocaleString('id-ID')}</td>
+            <td style="color:red; font-weight:bold;">Rp ${sisa.toLocaleString('id-ID')}</td>
+            <td>${statusBadge}</td>
+            <td>${tombolAksi}</td>
+        </tr>`;
+    });
+    tabelPiutang.innerHTML = html + `</tbody>`;
+    total_piutang.innerText = total.toLocaleString('id-ID');
+}
+
+function loadPendapatan(){
+    let lunas = dataTransaksi.filter(t => t.status_bayar == 'Lunas');
+    let total = lunas.reduce((sum,t)=> sum + parseInt(t.total_bayar), 0);
+    let html = `<thead><tr><th>No</th><th>Invoice</th><th>Customer</th><th>Tgl</th><th>Total Bayar</th></tr></thead><tbody>`;
+    lunas.forEach((t,i)=>{
+        let cus = dataCustomer.find(c=>c.id==t.id_customer) || dataCustomerReguler.find(c=>c.id==t.id_customer);
+        html += `<tr><td>${i+1}</td><td>${t.no_invoice}</td><td>${cus?.nama_customer}</td><td>${t.tgl_kembali}</td><td>Rp ${parseInt(t.total_bayar).toLocaleString('id-ID')}</td></tr>`;
+    });
+    tabelPendapatan.innerHTML = html + `</tbody>`;
+    total_pendapatan.innerText = total.toLocaleString('id-ID');
+}
+
+function bukaBayar(id){
+    idBayar = id;
+    let t = dataTransaksi.find(x=>x.id==id);
+    bayar_invoice.value = t.no_invoice;
+    let sisa = parseInt(t.sisa_piutang) || (parseInt(t.total_bayar) - parseInt(t.deposit || 0));
+    bayar_sisa.value = 'Rp ' + sisa.toLocaleString('id-ID');
+    bayar_nominal.max = sisa;
+    modalBayar.style.display = 'block';
+}
+
+function cancelPiutang(id){
+    if(confirm('Yakin mau CANCEL/RESET piutang ini? \nDeposit akan dikembalikan ke 0 dan status jadi Belum Lunas')){
+        let t = dataTransaksi.find(x=>x.id==id);
+        t.deposit = 0;
+        t.sisa_piutang = parseInt(t.total_bayar);
+        t.status_bayar = 'Belum Lunas';
+        t.riwayat_bayar = []; // hapus riwayat bayar juga
+        localStorage.setItem('dataTransaksi', JSON.stringify(dataTransaksi));
+        alert('✅ Piutang berhasil di-RESET ke awal');
+        loadPiutang();
+    }
+}
+
+document.getElementById('formBayar').addEventListener('submit', function(e){
+    e.preventDefault();
+    let t = dataTransaksi.find(x=>x.id==idBayar);
+    let bayar = parseInt(bayar_nominal.value) || 0;
+    t.deposit = parseInt(t.deposit || 0) + bayar;
+    t.sisa_piutang = parseInt(t.total_bayar) - t.deposit;
+    if(t.sisa_piutang <= 0){ t.status_bayar = 'Lunas'; t.sisa_piutang = 0; }
+    localStorage.setItem('dataTransaksi', JSON.stringify(dataTransaksi));
+    alert('✅ Pembayaran berhasil!');
+    modalBayar.style.display = 'none';
+    this.reset();
+    loadPiutang();
+})
+
+window.onclick = function(event) { if (event.target == modalBayar) modalBayar.style.display = "none"; }
+loadData();
+</script>
+</body>
+</html>

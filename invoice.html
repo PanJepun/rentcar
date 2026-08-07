@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>INVOICE SEWA</title>
+<style>
+body { font-family: Arial; font-size: 12px; padding: 20px; }
+.invoice { width: 800px; margin: auto; border: 2px solid #000; padding: 20px; }
+.header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+.header h1 { margin: 0; color: #d4af37; }
+.header p { margin: 2px; }
+.row { display: flex; margin-bottom: 8px; }
+.label { width: 150px; font-weight: bold; }
+.value { flex: 1; }
+.tabel { width: 100%; border-collapse: collapse; margin-top: 15px; }
+.tabel th, .tabel td { border: 1px solid #000; padding: 8px; text-align: left; }
+.tabel th { background: #f0f0f0; }
+.total { text-align: right; font-size: 16px; font-weight: bold; margin-top: 10px; }
+.footer { margin-top: 50px; display: flex; justify-content: space-between; }
+.ttd { text-align: center; width: 200px; }
+@media print { .btn-print { display: none; } }
+.btn-print { background:#28a745; color:white; border:none; padding:10px 20px; font-size:14px; cursor:pointer; border-radius:4px; margin:10px auto; display:block; }
+</style>
+</head>
+<body>
+
+<button class="btn-print" onclick="window.print()">CETAK INVOICE</button>
+
+<div class="invoice" id="invoiceContent">
+    <div class="header">
+        <h1>RENTAL MOBIL BEB</h1>
+        <p>Jl. Raya Sawan No. 123, Bali</p>
+        <p>Telp: 0812-3456-7890</p>
+    </div>
+
+    <div class="row">
+        <div class="label">No. Invoice</div>
+        <div class="value">: <span id="inv_no"></span></div>
+        <div class="label">Tanggal</div>
+        <div class="value">: <span id="inv_tgl"></span></div>
+    </div>
+
+    <h3>DATA CUSTOMER</h3>
+    <div class="row"><div class="label">Nama</div><div class="value">: <span id="cus_nama"></span></div></div>
+    <div class="row"><div class="label">No HP</div><div class="value">: <span id="cus_hp"></span></div></div>
+    <div class="row"><div class="label">Alamat</div><div class="value">: <span id="cus_alamat"></span></div></div>
+    <div class="row"><div class="label">Jenis</div><div class="value">: <span id="cus_jenis"></span></div></div>
+
+    <h3>DATA SEWA</h3>
+    <table class="tabel">
+        <tr>
+            <th>Mobil</th>
+            <th>Tgl Keluar</th>
+            <th>Tgl Kembali</th>
+            <th>Hari</th>
+            <th>Overtime</th>
+            <th>Harga/Hari</th>
+        </tr>
+        <tr>
+            <td id="mob_detail"></td>
+            <td id="tgl_keluar"></td>
+            <td id="tgl_kembali"></td>
+            <td id="hari"></td>
+            <td id="ot"></td>
+            <td id="harga"></td>
+        </tr>
+    </table>
+
+    <div class="total">TOTAL BAYAR: Rp <span id="total"></span></div>
+
+    <div class="footer">
+        <div class="ttd">
+            Customer<br><br><br><br>
+            (<span id="cus_ttd"></span>)
+        </div>
+        <div class="ttd">
+            Admin<br><br><br><br>
+            (_______________)
+        </div>
+    </div>
+</div>
+
+<script>
+let dataTransaksi = JSON.parse(localStorage.getItem('dataTransaksi')) || [];
+let dataCustomer = JSON.parse(localStorage.getItem('dataCustomer')) || [];
+let dataCustomerReguler = JSON.parse(localStorage.getItem('dataCustomerReguler')) || [];
+let dataMobil = JSON.parse(localStorage.getItem('dataMobil')) || [];
+
+// AMBIL ID DARI URL
+const urlParams = new URLSearchParams(window.location.search);
+const id = parseInt(urlParams.get('id'));
+
+let t = dataTransaksi.find(x=>x.id==id);
+if(t){
+    let cus = dataCustomer.find(c=>c.id==t.id_customer) || dataCustomerReguler.find(c=>c.id==t.id_customer);
+    let mob = dataMobil.find(m=>m.id==t.id_mobil);
+
+    document.getElementById('inv_no').innerText = t.no_invoice;
+    document.getElementById('inv_tgl').innerText = new Date().toLocaleDateString('id-ID');
+    document.getElementById('cus_nama').innerText = cus?.nama_customer || '-';
+    document.getElementById('cus_hp').innerText = cus?.no_hp || '-';
+    document.getElementById('cus_alamat').innerText = cus?.alamat || '-';
+    document.getElementById('cus_jenis').innerText = t.tipe_customer.toUpperCase();
+    document.getElementById('cus_ttd').innerText = cus?.nama_customer || '-';
+    
+    document.getElementById('mob_detail').innerText = `${mob?.no_polis} - ${mob?.merk} ${mob?.type} ${mob?.tahun}`;
+    document.getElementById('tgl_keluar').innerText = `${t.tgl_sewa} ${t.jam_keluar}`;
+    document.getElementById('tgl_kembali').innerText = `${t.tgl_kembali} ${t.jam_kembali}`;
+    document.getElementById('hari').innerText = t.jumlah_hari + ' Hari';
+    document.getElementById('ot').innerText = t.overtime;
+    document.getElementById('harga').innerText = 'Rp ' + parseInt(t.harga_sewa).toLocaleString('id-ID');
+    document.getElementById('total').innerText = parseInt(t.total_bayar).toLocaleString('id-ID');
+} else {
+    document.getElementById('invoiceContent').innerHTML = '<h2>Data tidak ditemukan</h2>';
+}
+</script>
+</body>
+</html>

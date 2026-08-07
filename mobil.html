@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>INFORMASI ARMADA MOBIL & SEPEDA MOTOR</title>
+<style>
+body {
+    font-family: 'Segoe UI', Arial; 
+    background: linear-gradient(135deg, #0a1629 0%, #12233a 100%);
+    margin: 0; padding: 15px; color: #333;
+    height: 100vh; overflow: hidden;
+}
+h2 { text-align: center; color: #d4af37; font-size: 18px; margin: 5px 0 15px 0; }
+
+.container { display: flex; gap: 15px; height: calc(100vh - 60px); }
+
+.box {
+    background: #f7eb81; border: 2px solid #d4af37; 
+    border-radius: 8px; padding: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.box-kiri { width: 50%; }
+.box-kanan { width: 50%; overflow-y: auto; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 110px 1fr 110px 1fr;
+    gap: 8px 12px; align-items: center; font-size: 13px;
+}
+.form-grid label { font-weight: 500; text-align: right; }
+.form-grid input,.form-grid select {
+    padding: 5px 8px; border: 1px solid #aaa; border-radius: 4px;
+    height: 26px; width: 100%; box-sizing: border-box;
+}
+.form-grid input[type="file"] { grid-column: 2 / 5; height: auto; border: none; }
+.form-grid.full { grid-column: 1 / 5; }
+input#tahun, input#cc, input#penumpang { width: 130px; }
+
+.btn-simpan { background: #007bff; color: white; border: none; padding: 8px 25px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; margin-top: 10px; }
+.btn-update { background: #28a745; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background: #d4af37; color: #000; padding: 8px; border: 1px solid #aaa; }
+td { padding: 6px; border: 1px solid #ddd; text-align: center; }
+td img { width: 40px; height: 28px; object-fit: cover; }
+.btn-aksi { color: white; border: none; padding: 4px 8px; font-size: 11px; border-radius: 3px; cursor: pointer; margin: 0 2px; }
+.btn-edit { background: #ffc107; color: #000; }
+.btn-hapus { background: #dc3545; }
+.btn-detail { background: #17a2b8; }
+
+.Ada { background: #e8f5e9; }.Keluar { background: #e3f2fd; }
+
+.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+.modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 60%; max-width: 600px; }
+.modal-content h3 { text-align: center; color: #d4af37; }
+.modal-content img { width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 10px; }
+.modal-grid { display: grid; grid-template-columns: 120px 1fr; gap: 8px; font-size: 13px; }
+.close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h2>INFORMASI ARMADA MOBIL & SEPEDA MOTOR</h2>
+<div class="container">
+
+    <div class="box box-kiri">
+        <form id="formMobil" class="form-grid">
+            <input type="hidden" id="edit_id">
+            <label>No. Polisi :</label><input type="text" id="plat" required>
+            <label></label><span></span>
+
+            <label>Nama Pemilik :</label><input type="text" id="nama_pemilik">
+            <label>Merk :</label><input type="text" id="merk">
+
+            <label>Alamat Pemilik :</label><input type="text" id="alamat_pemilik" class="full">
+            
+            <label>Type :</label><input type="text" id="type">
+            <label>Status :</label>
+            <select id="kepemilikan"><option>Milik Sendiri</option><option>Titipan</option></select>
+
+            <label>Tahun :</label><input type="number" id="tahun">
+            <label>Warna :</label><input type="text" id="warna">
+
+            <label>Isi Silinder :</label><input type="number" id="cc">
+            <label>Bahan Bakar :</label><input type="text" id="bbm">
+
+            <label>Jumlah Penumpang :</label><input type="number" id="penumpang" value="4">
+            <label>Transmisi :</label>
+            <select id="transmisi">
+                <option value="">- Pilih -</option>
+                <option value="Manual">Manual</option>
+                <option value="Matic">Matic</option>
+            </select>
+
+            <label>No Rangka :</label><input type="text" id="no_rangka">
+            <label>No Mesin :</label><input type="text" id="no_mesin">
+
+            <label>No. BPKB :</label><input type="text" id="no_bpkb">
+            <label>Harga/Hari :</label><input type="number" id="harga">
+
+            <label>Berlaku Sd :</label><input type="date" id="tgl_stnk">
+            <label></label><span></span>
+
+            <label>Foto Mobil :</label><input type="file" id="foto" accept="image/*">
+
+            <label>Status Unit :</label>
+            <select id="status_mobil"><option>Ada</option><option>Keluar</option><option>Service</option><option>Rusak</option></select>
+            <label></label><span></span>
+
+            <button type="submit" id="btnSimpan" class="btn-simpan full">Simpan</button>
+        </form>
+    </div>
+
+    <div class="box box-kanan">
+        <table id="tabelMobil">
+            <thead>
+                <tr>
+                    <th>Foto</th><th>No Polisi</th><th>Nama</th><th>Merk</th><th>Type</th>
+                    <th>Tahun</th><th>Penumpang</th><th>Transmisi</th><th>Status</th><th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<div id="modalDetail" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>DETAIL DATA MOBIL</h3>
+    <img id="detail_foto">
+    <div class="modal-grid" id="detail_body"></div>
+  </div>
+</div>
+
+<script>
+let dataMobil = JSON.parse(localStorage.getItem('dataMobil')) || [];
+let fotoBase64 = "";
+let modeEdit = false;
+
+// ENTER PINDAH KOLOM
+document.getElementById('formMobil').addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && e.target.tagName!== 'BUTTON'){
+        e.preventDefault();
+        const inputs = Array.from(this.querySelectorAll('input, select, button'));
+        const index = inputs.indexOf(e.target);
+        if(index > -1 && index < inputs.length - 1){ inputs[index + 1].focus(); }
+    }
+});
+
+document.getElementById('foto').addEventListener('change', function(e){
+    let file = e.target.files[0];
+    if(file){
+        let reader = new FileReader();
+        reader.onload = function(event){ fotoBase64 = event.target.result; }
+        reader.readAsDataURL(file);
+    }
+});
+
+document.getElementById('formMobil').addEventListener('submit', function(e){
+    e.preventDefault();
+    let id = document.getElementById('edit_id').value;
+    let mobil = {};
+    
+    this.querySelectorAll('input, select').forEach(el => {
+        if(el.id!= 'foto' && el.id!= 'edit_id') mobil[el.id] = el.value;
+    });
+    mobil.foto = fotoBase64 || dataMobil.find(m=>m.id==id)?.foto || "";
+
+    if(modeEdit){ // UPDATE
+        let index = dataMobil.findIndex(m=>m.id==parseInt(id));
+        mobil.id = parseInt(id);
+        dataMobil[index] = mobil;
+        alert('✅ Data diupdate!');
+        modeEdit = false;
+        document.getElementById('btnSimpan').innerText = 'Simpan';
+        document.getElementById('btnSimpan').classList.remove('btn-update');
+    } else { // SIMPAN BARU
+        mobil.id = Date.now();
+        dataMobil.push(mobil);
+        alert('✅ Data tersimpan!');
+    }
+    
+    localStorage.setItem('dataMobil', JSON.stringify(dataMobil));
+    this.reset(); fotoBase64 = ""; document.getElementById('edit_id').value = "";
+    tampilkanTabel();
+});
+
+function tampilkanTabel(){
+    let tbody = document.querySelector('#tabelMobil tbody');
+    tbody.innerHTML = '';
+    dataMobil.forEach(m => {
+        tbody.innerHTML += `<tr class="${m.status_mobil}">
+            <td><img src="${m.foto}"></td>
+            <td>${m.plat}</td><td>${m.nama_pemilik}</td>
+            <td>${m.merk}</td><td>${m.type}</td>
+            <td>${m.tahun}</td><td>${m.penumpang || '-'}</td>
+            <td>${m.transmisi}</td>
+            <td><b>${m.status_mobil}</b></td>
+            <td>
+                <button class="btn-aksi btn-detail" onclick="detailData(${m.id})">Detail</button>
+                <button class="btn-aksi btn-edit" onclick="editData(${m.id})">Edit</button>
+                <button class="btn-aksi btn-hapus" onclick="hapus(${m.id})">Hapus</button>
+            </td>
+        </tr>`;
+    })
+}
+
+function editData(id){
+    let m = dataMobil.find(x=>x.id==id);
+    if(!m) return;
+    
+    document.getElementById('edit_id').value = m.id;
+    
+    // ISI 1 PER 1 BIAR SELECT DAN NUMBER KEISI
+    document.getElementById('plat').value = m.plat || '';
+    document.getElementById('nama_pemilik').value = m.nama_pemilik || '';
+    document.getElementById('merk').value = m.merk || '';
+    document.getElementById('alamat_pemilik').value = m.alamat_pemilik || '';
+    document.getElementById('type').value = m.type || '';
+    document.getElementById('kepemilikan').value = m.kepemilikan || 'Milik Sendiri';
+    document.getElementById('tahun').value = m.tahun || '';
+    document.getElementById('warna').value = m.warna || '';
+    document.getElementById('cc').value = m.cc || '';
+    document.getElementById('bbm').value = m.bbm || '';
+    document.getElementById('penumpang').value = m.penumpang || '4';
+    document.getElementById('transmisi').value = m.transmisi || '';
+    document.getElementById('no_rangka').value = m.no_rangka || '';
+    document.getElementById('no_mesin').value = m.no_mesin || '';
+    document.getElementById('no_bpkb').value = m.no_bpkb || '';
+    document.getElementById('harga').value = m.harga || '';
+    document.getElementById('tgl_stnk').value = m.tgl_stnk || '';
+    document.getElementById('status_mobil').value = m.status_mobil || 'Ada';
+    
+    fotoBase64 = m.foto; // simpan foto lama
+    modeEdit = true;
+    document.getElementById('btnSimpan').innerText = 'Update Data';
+    document.getElementById('btnSimpan').classList.add('btn-update');
+    window.scrollTo(0,0);
+}
+
+function detailData(id){
+    let m = dataMobil.find(x=>x.id==id);
+    document.getElementById('detail_foto').src = m.foto;
+    let body = '';
+    for(let key in m){
+        if(key!='id' && key!='foto'){
+            let label = key.replace('_',' ').toUpperCase();
+            body += `<b>${label}:</b><span>${m[key] || '-'}</span>`;
+        }
+    }
+    document.getElementById('detail_body').innerHTML = body;
+    document.getElementById('modalDetail').style.display = 'block';
+}
+
+function hapus(id){
+    if(confirm('Yakin hapus?')){
+        dataMobil = dataMobil.filter(m=>m.id!=id);
+        localStorage.setItem('dataMobil', JSON.stringify(dataMobil));
+        tampilkanTabel();
+    }
+}
+
+// TUTUP MODAL
+document.querySelector('.close').onclick = function(){ document.getElementById('modalDetail').style.display = 'none'; }
+window.onclick = function(event){ if(event.target==document.getElementById('modalDetail')) document.getElementById('modalDetail').style.display = 'none'; }
+
+tampilkanTabel();
+</script>
+</body>
+</html>
