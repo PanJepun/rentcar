@@ -135,8 +135,8 @@
 
     <script>
         // ====== SETTING WA NOTIFIKASI - GANTI INI ======
-        const WA_TOKEN = "ISI_TOKEN_FONNTE_KAMU_DISINI";
-        const NOMOR_OWNER = "6281234567890"; // pake 62
+        const WA_TOKEN = "AHdnAppaZGYiKcaWt1JH";
+        const NOMOR_OWNER = "6282340152478"; // pake 62
 
         let dataCustomer = JSON.parse(localStorage.getItem('dataCustomer')) || [];
         let dataCustomerReguler = JSON.parse(localStorage.getItem('dataCustomerReguler')) || [];
@@ -394,7 +394,7 @@
                 dataTransaksi = dataTransaksi.filter(x => x.id!= id);
                 localStorage.setItem('dataTransaksi', JSON.stringify(dataTransaksi));
 
-                alert('✅ Data dihapus. Owner sudah dinotifikasi via WA');
+                //alert('✅ Data dihapus. Owner sudah dinotifikasi via WA');
                 loadTabelTransaksi();
                 loadDropdownMobil();
             }
