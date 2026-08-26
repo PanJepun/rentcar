@@ -7,21 +7,27 @@ body { font-family: 'Segoe UI', Arial; background: #0a1629; margin: 0; padding: 
 h2 { text-align: center; color: #d4af37; font-size: 20px; margin: 5px 0 15px 0; font-weight: bold; }
 .box { background: white; border: 2px solid #d4af37; border-radius: 8px; padding: 20px; max-width: 1400px; margin: auto; }
 .btn-tambah { background:#28a745; color:white; border:none; padding:10px 15px; border-radius:4px; cursor:pointer; font-weight:bold; margin-bottom:15px; }
-.tabel { width:100%; border-collapse:collapse; font-size:12px; }
-.tabel th { background:#d4af37; color:#000; padding:8px; text-align:center; }
-.tabel td { border:1px solid #ddd; padding:6px; text-align:center; }
+.tabel { width:100%; border-collapse:collapse; font-size:12px; white-space: nowrap; }
+.tabel th { background:#d4af37; color:#000; padding:10px 6px; text-align:center; position: sticky; top: 0; } /* TINGGIKAN */
+.tabel td { border:1px solid #ddd; padding:10px 6px; text-align:center; height: 45px; } /* TINGGIKAN */
 .tabel td.kiri { text-align:left; }
 .tabel td.kanan { text-align:right; font-weight:bold; }
 .tabel tr:nth-child(even){ background:#f9f9f9; }
-.btn-aksi { padding:4px 8px; border:none; border-radius:3px; cursor:pointer; font-size:11px; margin:0 2px; }
+.tabel tr:hover{ background:#fff3cd; }
+.tabel img { width:40px; height:40px; object-fit:cover; border-radius:4px; }
+.btn-aksi { padding:4px 6px; border:none; border-radius:3px; cursor:pointer; font-size:10px; margin:0 1px; }
 .btn-edit { background:#ffc107; color:#000; }
 .btn-hapus { background:#dc3545; color:#fff; }
 .badge-aktif { background:#28a745; color:white; padding:2px 6px; border-radius:3px; font-size:10px; }
-.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
-.modal-content { background: #e8f5c8; margin: 5% auto; padding: 20px; border-radius: 8px; width: 60%; max-width: 700px; border: 2px solid #d4af37; }
+.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); overflow-y:auto; }
+.modal-content { background: #e8f5c8; margin: 2% auto; padding: 20px; border-radius: 8px; width: 70%; max-width: 850px; border: 2px solid #d4af37; } /* LEBIH LEBAR */
 .close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-.form-customer { display: grid; grid-template-columns: 130px 1fr; gap: 10px 15px; align-items: center; }
+.form-customer { display: grid; grid-template-columns: 140px 1fr 140px 1fr; gap: 10px 12px; align-items: center; }
+.form-customer input,.form-customer select,.form-customer textarea { padding: 8px; } /* TINGGIKAN INPUT */
+.form-customer.full { grid-column: 1/5; }
 .btn-simpan-cus { background:#007bff; color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-weight:bold; }
+.foto-preview { width: 80px; height: 80px; border: 1px solid #ccc; object-fit: cover; border-radius: 4px; }
+.section-title { grid-column: 1/5; font-weight: bold; color: #0a1629; border-bottom: 1px solid #d4af37; margin: 5px 0; padding-bottom: 3px; }
 </style>
 </head>
 <body>
@@ -29,98 +35,108 @@ h2 { text-align: center; color: #d4af37; font-size: 20px; margin: 5px 0 15px 0; 
 <h2>DATA CUSTOMER REGULER</h2>
 <div class="box">
     <button class="btn-tambah" onclick="openModalTambah()">+ TAMBAH CUSTOMER REGULER</button>
-
     <div style="overflow-x:auto;">
         <table class="tabel">
-            <thead>
-                <tr>
-                    <th>No</th><th>No KTP</th><th>Nama Customer</th><th>No HP</th>
-                    <th>Email</th><th>Alamat</th><th>Pekerjaan</th><th>JK</th>
-                    <th>Jml Sewa</th><th>Total Transaksi</th><th>Status</th><th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="tbodyReguler">
-                <tr><td colspan="12">Belum ada data customer reguler</td></tr>
-            </tbody>
+            <thead><tr>
+                <th>No</th><th>Foto</th><th>No KTP/Passport</th><th>Nama</th><th>No HP</th>
+                <th>Email</th><th>Alamat Sementara</th><th>Kebangsaan</th><th>No SIM</th>
+                <th>Insurance</th> <!-- BARU -->
+                <th>Jml Sewa</th><th>Total Transaksi</th><th>Status</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="tbodyReguler"><tr><td colspan="14">Belum ada data customer reguler</td></tr></tbody> <!-- 14 KOLOM -->
         </table>
     </div>
 </div>
 
-<!-- MODAL FORM -->
 <div id="modalCustReguler" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
     <h3 id="judulModal">FORM CUSTOMER REGULER</h3>
     <form id="formCustReguler" class="form-customer">
         <input type="hidden" id="id_edit">
-        <label>No. KTP :</label><input type="text" id="reg_ktp" required>
+        <div class="section-title full">DATA PRIBADI</div>
+        <label>No. KTP/Passport :</label><input type="text" id="reg_ktp" required>
         <label>Nama Customer :</label><input type="text" id="reg_nama" required>
+        <label>Kebangsaan :</label><input type="text" id="reg_nationality" placeholder="Indonesia">
+        <label>No. SIM / Driving License :</label><input type="text" id="reg_sim">
+
         <label>No. HP / WA :</label><input type="text" id="reg_hp" required>
         <label>Email :</label><input type="email" id="reg_email">
-        <label>Alamat :</label><textarea id="reg_alamat" rows="3" required></textarea>
+        <label>Instagram :</label><input type="text" id="reg_ig" placeholder="@username">
+        <label>Jenis Kelamin :</label><select id="reg_jk" required><option value="">- Pilih -</option><option>Laki-laki</option><option>Perempuan</option></select>
+
+        <div class="section-title full">ALAMAT</div>
+        <label>Alamat Sementara :</label><textarea id="reg_alamat_sementara" rows="2" required></textarea>
+        <label>Room No :</label><input type="text" id="reg_room">
+        <label>Alamat Tetap :</label><textarea id="reg_alamat_tetap" rows="2"></textarea>
         <label>Pekerjaan :</label><input type="text" id="reg_pekerjaan">
-        <label>Jenis Kelamin :</label>
-        <select id="reg_jk" required>
-            <option value="">- Pilih -</option>
-            <option>Laki-laki</option>
-            <option>Perempuan</option>
-        </select>
-        <label>Status :</label>
-        <select id="reg_status">
-            <option value="Aktif">Aktif</option>
-            <option value="Non-Aktif">Non-Aktif</option>
-        </select>
-        <div style="grid-column:1/3;"><button type="submit" class="btn-simpan-cus">SIMPAN</button></div>
+
+        <div class="section-title full">LAINNYA</div>
+        <label>No. Helm :</label><input type="text" id="reg_helm">
+        <label>Default Insurance :</label><input type="number" id="reg_insurance" value="1400000" placeholder="1400000"> <!-- BARU -->
+        <label>Status :</label><select id="reg_status"><option value="Aktif">Aktif</option><option value="Non-Aktif">Non-Aktif</option></select>
+        <label>Upload Foto :</label><div><input type="file" id="reg_foto" accept="image/*" onchange="previewFoto(event)"><img id="preview_img" class="foto-preview" src="" style="display:none;"></div>
+
+        <div class="full" style="text-align:center; margin-top:10px;"><button type="submit" class="btn-simpan-cus">SIMPAN</button></div>
     </form>
   </div>
 </div>
 
 <script>
 let dataCustomerReguler = JSON.parse(localStorage.getItem('dataCustomerReguler')) || [];
-let dataTransaksi = JSON.parse(localStorage.getItem('dataTransaksi')) || []; // AMBIL DATA TRANSAKSI
-let idEdit = null;
+let dataTransaksi = JSON.parse(localStorage.getItem('dataTransaksi')) || [];
+let idEdit = null; let fotoBase64 = '';
+
+function previewFoto(e){
+    let file = e.target.files[0];
+    if(file){
+        let reader = new FileReader();
+        reader.onload = function(ev){
+            fotoBase64 = ev.target.result;
+            document.getElementById('preview_img').src = fotoBase64;
+            document.getElementById('preview_img').style.display = 'inline-block';
+        }
+        reader.readAsDataURL(file);
+    }
+}
 
 function loadTabelReguler(){
+    dataCustomerReguler = JSON.parse(localStorage.getItem('dataCustomerReguler')) || [];
+    dataTransaksi = JSON.parse(localStorage.getItem('dataTransaksi')) || [];
     let tbody = document.getElementById('tbodyReguler');
     if(dataCustomerReguler.length == 0){
-        tbody.innerHTML = '<tr><td colspan="12">Belum ada data customer reguler</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="14">Belum ada data customer reguler</td></tr>'; // 14
         return;
     }
     tbody.innerHTML = '';
     dataCustomerReguler.forEach((c, i) => {
-        // HITUNG TOTAL SEWA & TOTAL BAYAR PER CUSTOMER
         let transaksiCus = dataTransaksi.filter(t => t.id_customer == c.id && t.tipe_customer == 'reguler');
         let jmlSewa = transaksiCus.length;
         let totalTransaksi = transaksiCus.reduce((sum, t) => sum + parseInt(t.total_bayar || 0), 0);
-
-        let statusBadge = c.status_customer == 'Aktif'
-          ? '<span class="badge-aktif">AKTIF</span>'
-            : '<span style="background:#dc3545; color:white; padding:2px 6px; border-radius:3px;">NON-AKTIF</span>';
+        let statusBadge = (c.status_customer || 'Aktif') == 'Aktif'? '<span class="badge-aktif">AKTIF</span>' : '<span style="background:#dc3545; color:white; padding:2px 6px; border-radius:3px;">NON-AKTIF</span>';
+        let foto = c.foto? `<img src="${c.foto}">` : '-';
+        let alamat = c.alamat_sementara || c.hotel || '-';
 
         tbody.innerHTML += `<tr>
-            <td>${i+1}</td>
-            <td>${c.no_ktp}</td>
-            <td class="kiri">${c.nama_customer}</td>
-            <td>${c.no_hp}</td>
-            <td class="kiri">${c.email || '-'}</td>
-            <td class="kiri">${c.alamat}</td>
-            <td>${c.pekerjaan || '-'}</td>
-            <td>${c.jenis_kelamin}</td>
+            <td>${i+1}</td><td>${foto}</td><td>${c.no_ktp || '-'}</td>
+            <td class="kiri">${c.nama_customer}</td><td>${c.no_hp}</td>
+            <td class="kiri">${c.email || '-'}</td><td class="kiri">${alamat}</td>
+            <td>${c.nationality || '-'}</td><td>${c.no_sim || '-'}</td>
+            <td class="kanan">Rp ${parseInt(c.insurance || 1400000).toLocaleString('id-ID')}</td> <!-- BARU -->
             <td>${jmlSewa} x</td>
             <td class="kanan">Rp ${totalTransaksi.toLocaleString('id-ID')}</td>
             <td>${statusBadge}</td>
-            <td>
-                <button class="btn-aksi btn-edit" onclick="editReguler(${c.id})">Edit</button>
-                <button class="btn-aksi btn-hapus" onclick="hapusReguler(${c.id})">Hapus</button>
-            </td>
+            <td><button class="btn-aksi btn-edit" onclick="editReguler(${c.id})">Edit</button><button class="btn-aksi btn-hapus" onclick="hapusReguler(${c.id})">Hapus</button></td>
         </tr>`;
     });
 }
 
 function openModalTambah(){
-    idEdit = null;
+    idEdit = null; fotoBase64 = '';
     document.getElementById('judulModal').innerText = 'FORM CUSTOMER REGULER - TAMBAH';
     document.getElementById('formCustReguler').reset();
+    document.getElementById('reg_insurance').value = '1400000'; // default
+    document.getElementById('preview_img').style.display = 'none';
     document.getElementById('modalCustReguler').style.display = 'block';
 }
 
@@ -129,21 +145,26 @@ function closeModal(){
 }
 
 function editReguler(id){
-    idEdit = id;
-    let c = dataCustomerReguler.find(x=>x.id==id);
-    if(!c) return;
-
+    idEdit = id; fotoBase64 = '';
+    let c = dataCustomerReguler.find(x=>x.id==id); if(!c) return;
     document.getElementById('judulModal').innerText = 'FORM CUSTOMER REGULER - EDIT';
-    id_edit.value = c.id;
-    reg_ktp.value = c.no_ktp;
-    reg_nama.value = c.nama_customer;
-    reg_hp.value = c.no_hp;
-    reg_email.value = c.email;
-    reg_alamat.value = c.alamat;
-    reg_pekerjaan.value = c.pekerjaan;
-    reg_jk.value = c.jenis_kelamin;
-    reg_status.value = c.status_customer;
-
+    document.getElementById('id_edit').value = c.id;
+    document.getElementById('reg_ktp').value = c.no_ktp || '';
+    document.getElementById('reg_nama').value = c.nama_customer || '';
+    document.getElementById('reg_nationality').value = c.nationality || '';
+    document.getElementById('reg_sim').value = c.no_sim || '';
+    document.getElementById('reg_insurance').value = c.insurance || '1400000'; // BARU
+    document.getElementById('reg_hp').value = c.no_hp || '';
+    document.getElementById('reg_email').value = c.email || '';
+    document.getElementById('reg_ig').value = c.instagram || '';
+    document.getElementById('reg_alamat_sementara').value = c.alamat_sementara || c.hotel || '';
+    document.getElementById('reg_room').value = c.room_no || '';
+    document.getElementById('reg_alamat_tetap').value = c.alamat_tetap || c.alamat || '';
+    document.getElementById('reg_pekerjaan').value = c.pekerjaan || '';
+    document.getElementById('reg_jk').value = c.jenis_kelamin || '';
+    document.getElementById('reg_helm').value = c.no_helm || '';
+    document.getElementById('reg_status').value = c.status_customer || 'Aktif';
+    if(c.foto){ document.getElementById('preview_img').src = c.foto; document.getElementById('preview_img').style.display = 'inline-block'; }
     document.getElementById('modalCustReguler').style.display = 'block';
 }
 
@@ -158,24 +179,33 @@ function hapusReguler(id){
 
 document.getElementById('formCustReguler').addEventListener('submit', function(e){
     e.preventDefault();
-
     let data = {
         id: idEdit || Date.now(),
-        no_ktp: reg_ktp.value,
-        nama_customer: reg_nama.value,
-        no_hp: reg_hp.value,
-        email: reg_email.value,
-        alamat: reg_alamat.value,
-        pekerjaan: reg_pekerjaan.value,
-        jenis_kelamin: reg_jk.value,
-        status_customer: reg_status.value
+        no_ktp: document.getElementById('reg_ktp').value,
+        nama_customer: document.getElementById('reg_nama').value,
+        nationality: document.getElementById('reg_nationality').value,
+        no_sim: document.getElementById('reg_sim').value,
+        insurance: document.getElementById('reg_insurance').value, // BARU
+        no_hp: document.getElementById('reg_hp').value,
+        email: document.getElementById('reg_email').value,
+        instagram: document.getElementById('reg_ig').value,
+        alamat_sementara: document.getElementById('reg_alamat_sementara').value,
+        hotel: document.getElementById('reg_alamat_sementara').value,
+        room_no: document.getElementById('reg_room').value,
+        alamat_tetap: document.getElementById('reg_alamat_tetap').value,
+        alamat: document.getElementById('reg_alamat_tetap').value,
+        pekerjaan: document.getElementById('reg_pekerjaan').value,
+        jenis_kelamin: document.getElementById('reg_jk').value,
+        no_helm: document.getElementById('reg_helm').value,
+        status_customer: document.getElementById('reg_status').value,
+        foto: fotoBase64 || (idEdit? dataCustomerReguler.find(x=>x.id==idEdit).foto : '')
     };
 
-    if(idEdit){ // UPDATE
+    if(idEdit){
         let index = dataCustomerReguler.findIndex(x=>x.id==idEdit);
         dataCustomerReguler[index] = data;
         alert('✅ Data berhasil diupdate');
-    } else { // TAMBAH BARU
+    } else {
         dataCustomerReguler.push(data);
         alert('✅ Data berhasil disimpan');
     }
@@ -186,7 +216,6 @@ document.getElementById('formCustReguler').addEventListener('submit', function(e
     loadTabelReguler();
 });
 
-// LOAD PERTAMA KALI
 loadTabelReguler();
 </script>
 </body>

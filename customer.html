@@ -29,7 +29,7 @@ h2 { text-align: center; color: #d4af37; font-size: 18px; margin: 5px 0 15px 0; 
 }
 .form-grid label { font-weight: 500; text-align: right; }
 .form-grid input,.form-grid select,.form-grid textarea {
-    padding: 6px 8px; border: 1px solid #d8cfcf; border-radius: 4px;
+    padding: 6px 8px; border: 1px solid #d8cf; border-radius: 4px;
     width: 100%; box-sizing: border-box;
 }
 .form-grid input[type="file"] { grid-column: 2/3; border: none; }
@@ -57,6 +57,13 @@ td img { width: 35px; height: 35px; object-fit: cover; border-radius: 50%; }
 .modal-content img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid #d4af37; margin-bottom: 10px; }
 .modal-grid { display: grid; grid-template-columns: 120px 1fr; gap: 8px; font-size: 13px; text-align: left; }
 .close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+
+/* TAMBAHAN BARU: CSS ZOOM FOTO */
+.foto-thumb { width: 35px; height: 35px; object-fit: cover; border-radius: 50%; cursor: zoom-in; border: 2px solid #d4af37; }
+.foto-thumb:hover { transform: scale(1.1); transition: 0.2s; }
+#modalZoom { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+#modalZoom img { margin: auto; display: block; max-width: 85%; max-height: 85%; margin-top: 4%; border: 3px solid #d4af37; border-radius: 8px; }
+#modalZoom.close-zoom { position: absolute; top: 20px; right: 35px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -126,6 +133,12 @@ td img { width: 35px; height: 35px; object-fit: cover; border-radius: 50%; }
   </div>
 </div>
 
+<!-- TAMBAHAN BARU: MODAL ZOOM FOTO -->
+<div id="modalZoom">
+  <span class="close-zoom" onclick="document.getElementById('modalZoom').style.display='none'">&times;</span>
+  <img id="imgZoom">
+</div>
+
 <script>
 let dataCustomer = JSON.parse(localStorage.getItem('dataCustomer')) || [];
 let modeEdit = false;
@@ -185,7 +198,8 @@ function tampilkanTabel(){
     tbody.innerHTML = '';
     dataCustomer.forEach(c => {
         let limit = c.limit_kredit? 'Rp ' + parseInt(c.limit_kredit).toLocaleString('id-ID') : '-';
-        let foto = c.foto? `<img src="${c.foto}">` : '-';
+        // UBAHAN BARU: tambah class foto-thumb dan ondblclick
+        let foto = c.foto? `<img src="${c.foto}" class="foto-thumb" ondblclick="zoomFoto('${c.foto}')">` : '-';
         tbody.innerHTML += `<tr>
             <td>${foto}</td><td>${c.no_ktp}</td><td>${c.nama_customer}</td><td>${c.no_hp}</td>
             <td>${limit}</td><td><b>${c.status_customer}</b></td>
@@ -257,9 +271,18 @@ function hapus(id){
     }
 }
 
+// TAMBAHAN BARU: FUNGSI ZOOM FOTO
+function zoomFoto(src){
+    document.getElementById('imgZoom').src = src;
+    document.getElementById('modalZoom').style.display = 'block';
+}
+
 // TUTUP MODAL
 document.querySelector('.close').onclick = function(){ document.getElementById('modalDetail').style.display = 'none'; }
-window.onclick = function(event){ if(event.target==document.getElementById('modalDetail')) document.getElementById('modalDetail').style.display = 'none'; }
+window.onclick = function(event){
+    if(event.target==document.getElementById('modalDetail')) document.getElementById('modalDetail').style.display = 'none';
+    if(event.target==document.getElementById('modalZoom')) document.getElementById('modalZoom').style.display = 'none';
+}
 
 tampilkanTabel();
 </script>

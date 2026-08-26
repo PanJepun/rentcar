@@ -1,116 +1,226 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<title>INVOICE SEWA</title>
+<meta charset="UTF-8">
+<title>Invoice APAMA</title>
 <style>
-body { font-family: Arial; font-size: 12px; padding: 20px; }
-.invoice { width: 800px; margin: auto; border: 2px solid #000; padding: 20px; }
-.header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-.header h1 { margin: 0; color: #d4af37; }
-.header p { margin: 2px; }
-.row { display: flex; margin-bottom: 8px; }
-.label { width: 150px; font-weight: bold; }
-.value { flex: 1; }
-.tabel { width: 100%; border-collapse: collapse; margin-top: 15px; }
-.tabel th, .tabel td { border: 1px solid #000; padding: 8px; text-align: left; }
-.tabel th { background: #f0f0f0; }
-.total { text-align: right; font-size: 16px; font-weight: bold; margin-top: 10px; }
-.footer { margin-top: 50px; display: flex; justify-content: space-between; }
-.ttd { text-align: center; width: 200px; }
-@media print { .btn-print { display: none; } }
-.btn-print { background:#28a745; color:white; border:none; padding:10px 20px; font-size:14px; cursor:pointer; border-radius:4px; margin:10px auto; display:block; }
+    @page { size: A4; margin: 10mm; } 
+    body{
+        font-family: 'Times New Roman', serif; 
+        font-size: 11px; 
+        width: 210mm; 
+        margin: 0 auto;
+        padding: 5mm;
+        line-height: 1.4;
+        color: #000;
+    }
+    .header{display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #000; padding-bottom: 3px; margin-bottom: 4px;}
+    .logo{font-size: 18px; font-weight: bold; font-style: italic;}
+    .logo span{display: block; font-size: 9px; font-style: normal;}
+    .judul{text-align: center; font-size: 13px; font-weight: bold;}
+    .no-kanan{text-align: right; font-size: 11px;}
+    .no-kanan input{border: none; width: 120px; text-align: left; background: transparent;}
+    .kecil{font-size: 9.5px; margin: 3px 0 6px 0;}
+    table{width: 100%; border-collapse: collapse;}
+    td{padding: 2px 2px; vertical-align: top;}
+    .l1{width: 130px;}
+    .l2{width: 200px;}
+    .l3{width: 70px;}
+    .l4{width: 90px;}
+    .paragraph{font-size:10.5px; text-align:justify; margin:6px 0;}
+    .note{font-size: 10px; margin-top: 6px;}
+    .note b{font-size: 10.5px;}
+    .ttd{display: flex; justify-content: space-between; margin-top: 35px; text-align: center; font-size: 11px;}
+    .ttd .box{width: 45%;}
+    .garis-ttd{border-top: 1px solid #000; margin-top: 40px; padding-top: 2px;}
+    .btn{float: right; margin: 3px; font-size: 11px; padding: 3px 8px;}
+    @media print{.btn{display: none;}}
 </style>
 </head>
-<body>
+<body onload="loadInvoice()">
+<button class="btn" onclick="window.print()">CETAK</button>
+<button class="btn" onclick="window.close()">TUTUP</button>
 
-<button class="btn-print" onclick="window.print()">CETAK INVOICE</button>
-
-<div class="invoice" id="invoiceContent">
-    <div class="header">
-        <h1>RENTAL MOBIL BEB</h1>
-        <p>Jl. Raya Sawan No. 123, Bali</p>
-        <p>Telp: 0812-3456-7890</p>
+<div class="header">
+    <div>
+        <div class="logo">APAMA <span>BIKE RENTAL</span></div>
     </div>
-
-    <div class="row">
-        <div class="label">No. Invoice</div>
-        <div class="value">: <span id="inv_no"></span></div>
-        <div class="label">Tanggal</div>
-        <div class="value">: <span id="inv_tgl"></span></div>
+    <div>
+        <div class="judul">CARS & MOTOR BIKE'S AGREEMENT</div>
     </div>
-
-    <h3>DATA CUSTOMER</h3>
-    <div class="row"><div class="label">Nama</div><div class="value">: <span id="cus_nama"></span></div></div>
-    <div class="row"><div class="label">No HP</div><div class="value">: <span id="cus_hp"></span></div></div>
-    <div class="row"><div class="label">Alamat</div><div class="value">: <span id="cus_alamat"></span></div></div>
-    <div class="row"><div class="label">Jenis</div><div class="value">: <span id="cus_jenis"></span></div></div>
-
-    <h3>DATA SEWA</h3>
-    <table class="tabel">
-        <tr>
-            <th>Mobil</th>
-            <th>Tgl Keluar</th>
-            <th>Tgl Kembali</th>
-            <th>Hari</th>
-            <th>Overtime</th>
-            <th>Harga/Hari</th>
-        </tr>
-        <tr>
-            <td id="mob_detail"></td>
-            <td id="tgl_keluar"></td>
-            <td id="tgl_kembali"></td>
-            <td id="hari"></td>
-            <td id="ot"></td>
-            <td id="harga"></td>
-        </tr>
-    </table>
-
-    <div class="total">TOTAL BAYAR: Rp <span id="total"></span></div>
-
-    <div class="footer">
-        <div class="ttd">
-            Customer<br><br><br><br>
-            (<span id="cus_ttd"></span>)
-        </div>
-        <div class="ttd">
-            Admin<br><br><br><br>
-            (_______________)
-        </div>
+    <div class="no-kanan">
+        <div>No. <input type="text" id="no_invoice" readonly></div>
     </div>
 </div>
 
+<div class="kecil">The renter must be in possession of International Driving Licence or a Local Licence which can be issued by Indonesia Goverment here with undersign.</div>
+
+<table>
+<tr>
+    <td class="l1">Name</td>
+    <td class="l2">: <span id="nama"></span></td>
+    <td class="l3">Room No :</td>
+    <td class="l4"><span id="room"></span></td>
+    <td class="l3">Out :</td>
+    <td class="l4"><span id="tgl_out"></span></td>
+</tr>
+<tr>
+    <td class="l1">Nationality</td>
+    <td class="l2">: <span id="nationality"></span></td>
+    <td class="l3">Kendaraan :</td>
+    <td colspan="3"><span id="merk"></span> - No. Pol: <b><span id="plat"></span></b></td>
+</tr>
+<tr>
+    <td class="l1">Passport Number</td>
+    <td class="l2">: <span id="passport"></span></td>
+    <td class="l3">Hp.</td>
+    <td colspan="3">: <span id="hp"></span></td>
+</tr>
+<tr>
+    <td class="l1">Driving Licence Number</td>
+    <td class="l2">: <span id="sim"></span></td>
+    <td class="l3">Email</td>
+    <td colspan="3">: <span id="email"></span></td>
+</tr>
+<tr>
+    <td class="l1">Present Address</td>
+    <td class="l2">: <span id="alamat"></span></td>
+    <td class="l3">@ Instagram</td>
+    <td colspan="3">: </td>
+</tr>
+<tr>
+    <td class="l1">Permanent Address</td>
+    <td class="l2">: <span id="alamat2"></span></td>
+    <td class="l3">Helmet :</td>
+    <td class="l4"><span id="helm"></span></td>
+    <td colspan="2"></td>
+</tr>
+</table>
+<p class="paragraph">Agrees to be responsible for any damages or loss of the motorcycle Police Registration Number <b><span id="plat2"></span></b> due a accident or stolen. And will pay in full proper amount of the money required to repair the damages or replace a loss motorcycle with a motorcycle of equal make and quality when it happens during the above mentioned motorcycle is in the hand of the renter. Further more the owner will not any responsible for personal injuries or accident suffered in connection with the above motorcycle</p>
+
+<table>
+<tr>
+    <td class="l1">Rental date</td>
+    <td colspan="5">: <span id="tgl_sewa"></span> Up to <span id="tgl_kembali"></span> At ( time ) <span id="jam_kembali"></span></td>
+</tr>
+<tr>
+    <td class="l1">Price</td>
+    <td colspan="5">: <span id="price">Rp 0</span> /day x <span id="jumlah_hari_inv">0</span> Hari</td>
+</tr>
+<tr>
+    <td class="l1">Insurance</td>
+    <td colspan="5">: <span id="insurance"></span> to cover loss and damage of the motorcycle concerned, not for flat the</td>
+</tr>
+<tr>
+    <td class="l1">Total paid</td>
+    <td colspan="5">: <span id="total_paid">Rp 0</span></td>
+</tr>
+<tr>
+    <td class="l1">Deposit</td>
+    <td colspan="5">: <span id="deposit">Rp 0</span></td>
+</tr>
+<tr>
+    <td class="l1">Sisa</td>
+    <td colspan="5">: <span id="sisa">Rp 0</span></td>
+</tr>
+</table>
+
+<div class="note">
+<b>Note :</b><br>
+1. The renter may not drive on the beach, not rent the motorcycle to another person<br>
+2. Payment extra charge for covers damages US $ 200 and cover loss of the rented motorcycle with the own risk US $ 800 per event for the renter<br>
+3. Extra time for hourly Rp. 50.000,- Maximum 4 hours<br>
+4. For flat tire responsibility the renter, not from rental or from insurance<br>
+5. The cancelation fee 50%<br>
+6. Delivery and pick up start 9 am - 7 pm
+</div>
+
+  <div style="margin-top: 45px; font-size: 11px; overflow: hidden;">
+
+    <!-- KIRI -->
+    <div style="float: left; width: 50%; text-align: center;">
+        Jimbaran Date : <span id="jimbaran_date"></span><br><br>
+        The Owner,<br><br><br>
+        (.................)
+    </div>
+
+    <!-- KAN -->
+    <div style="float: right; width: 50%; text-align: center; padding-top: 45px;">
+        The Renter,<br><br><br>
+        (.................)
+    </div>
+
+</div>
+<div style="clear:both"></div>
+
 <script>
-let dataTransaksi = JSON.parse(localStorage.getItem('dataTransaksi')) || [];
-let dataCustomer = JSON.parse(localStorage.getItem('dataCustomer')) || [];
-let dataCustomerReguler = JSON.parse(localStorage.getItem('dataCustomerReguler')) || [];
-let dataMobil = JSON.parse(localStorage.getItem('dataMobil')) || [];
+    // TAMBAHIN INI DI BAWAH SCRIPT KAMU YANG LAMA
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('jimbaran_date').textContent = today.toLocaleDateString('en-GB', options);
+</script>
 
-// AMBIL ID DARI URL
-const urlParams = new URLSearchParams(window.location.search);
-const id = parseInt(urlParams.get('id'));
+</div>
+<div style="clear:both"></div> 
 
-let t = dataTransaksi.find(x=>x.id==id);
-if(t){
-    let cus = dataCustomer.find(c=>c.id==t.id_customer) || dataCustomerReguler.find(c=>c.id==t.id_customer);
-    let mob = dataMobil.find(m=>m.id==t.id_mobil);
-
-    document.getElementById('inv_no').innerText = t.no_invoice;
-    document.getElementById('inv_tgl').innerText = new Date().toLocaleDateString('id-ID');
-    document.getElementById('cus_nama').innerText = cus?.nama_customer || '-';
-    document.getElementById('cus_hp').innerText = cus?.no_hp || '-';
-    document.getElementById('cus_alamat').innerText = cus?.alamat || '-';
-    document.getElementById('cus_jenis').innerText = t.tipe_customer.toUpperCase();
-    document.getElementById('cus_ttd').innerText = cus?.nama_customer || '-';
+<script>
+function loadInvoice(){
+    let id = new URLSearchParams(window.location.search).get('id');
+    let dataTransaksi = JSON.parse(localStorage.getItem('dataTransaksi')) || [];
+    let dataCustomer = JSON.parse(localStorage.getItem('dataCustomer')) || [];
+    let dataCustomerReguler = JSON.parse(localStorage.getItem('dataCustomerReguler')) || [];
+    let dataMobil = JSON.parse(localStorage.getItem('dataMobil')) || [];
     
-    document.getElementById('mob_detail').innerText = `${mob?.no_polis} - ${mob?.merk} ${mob?.type} ${mob?.tahun}`;
-    document.getElementById('tgl_keluar').innerText = `${t.tgl_sewa} ${t.jam_keluar}`;
-    document.getElementById('tgl_kembali').innerText = `${t.tgl_kembali} ${t.jam_kembali}`;
-    document.getElementById('hari').innerText = t.jumlah_hari + ' Hari';
-    document.getElementById('ot').innerText = t.overtime;
-    document.getElementById('harga').innerText = 'Rp ' + parseInt(t.harga_sewa).toLocaleString('id-ID');
-    document.getElementById('total').innerText = parseInt(t.total_bayar).toLocaleString('id-ID');
-} else {
-    document.getElementById('invoiceContent').innerHTML = '<h2>Data tidak ditemukan</h2>';
+    let t = dataTransaksi.find(x => x.id == id); 
+    if(t){
+        let cus = dataCustomer.find(c => c.id == t.id_customer) || dataCustomerReguler.find(c => c.id == t.id_customer);
+        let mob = dataMobil.find(m => m.id == t.id_mobil);
+
+        document.getElementById('no_invoice').value = t.no_invoice;
+        document.getElementById('nama').innerText = cus?.nama_customer || '';
+        document.getElementById('nationality').innerText = cus?.kewarganegaraan || 'Indonesia';
+        document.getElementById('passport').innerText = cus?.no_passport || '';
+        document.getElementById('sim').innerText = cus?.no_sim || '';
+        document.getElementById('alamat').innerText = cus?.alamat || '';
+        document.getElementById('alamat2').innerText = cus?.alamat || '';
+        document.getElementById('hp').innerText = cus?.no_hp || '';
+        document.getElementById('email').innerText = cus?.email || '';
+        document.getElementById('plat').innerText = mob?.plat || '';
+        document.getElementById('plat2').innerText = mob?.plat || '';
+        document.getElementById('helm').innerText = t.jumlah_helm || '';
+        document.getElementById('room').innerText = t.no_kamar || '-';
+        
+        // INFO KENDARAAN SEJAJAR ROOM NO
+        document.getElementById('merk').innerText = mob?.merk || '';
+
+        document.getElementById('tgl_out').innerText = t.tgl_sewa;
+        document.getElementById('tgl_sewa').innerText = t.tgl_sewa;
+        document.getElementById('tgl_kembali').innerText = t.tgl_kembali;
+        document.getElementById('jam_kembali').innerText = t.jam_kembali || '18:00';
+
+        let hargaVal = parseInt(mob?.harga || 0);
+        let depositVal = parseInt(t.deposit || 0);
+        
+        let jamKeluar = t.jam_keluar || '09:00';
+        let jamKembali = t.jam_kembali || '18:00';
+        let tgl1 = new Date(t.tgl_sewa + 'T' + jamKeluar);
+        let tgl2 = new Date(t.tgl_kembali + 'T' + jamKembali);
+        let selisihJam = (tgl2 - tgl1) / (1000 * 60 * 60);
+        let hari = Math.ceil(selisihJam / 24); 
+        if(hari <= 0) hari = 1;
+
+        let totalVal = parseInt(t.total_bayar) || (hargaVal * hari);
+        let sisaVal = totalVal - depositVal;
+
+        document.getElementById('price').innerText = 'Rp ' + hargaVal.toLocaleString('id-ID');
+        document.getElementById('jumlah_hari_inv').innerText = hari;
+        document.getElementById('total_paid').innerText = 'Rp ' + totalVal.toLocaleString('id-ID');
+        document.getElementById('deposit').innerText = 'Rp ' + depositVal.toLocaleString('id-ID');
+        document.getElementById('sisa').innerText = 'Rp ' + sisaVal.toLocaleString('id-ID');
+
+        let insuranceVal = parseInt(cus?.insurance || 0);
+        document.getElementById('insurance').innerText = insuranceVal > 0 ? 'Rp ' + insuranceVal.toLocaleString('id-ID') : '-';
+    }
 }
 </script>
 </body>
