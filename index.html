@@ -28,7 +28,8 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 .slide-info .detail-grid{display:grid;grid-template-columns:110px 1fr;gap:10px;font-size:14px;margin:15px 0}
 .harga-box{background:rgba(212,175,55,0.2);padding:12px;border-radius:6px;margin:15px 0;border-left:3px solid #d4af37}
 .harga-box .value{font-size:22px;color:#d4af37;font-weight:bold}
-.btn-wa{background:#25D366;color:white;padding:12px 15px;border-radius:50px;text-decoration:none;font-weight:bold;text-align:center;border:none;cursor:pointer}
+.btn-wa{background:#25D366;color:white;padding:12px 15px;border-radius:50px;text-decoration:none;font-weight:bold;text-align:center;border:none;cursor:pointer;transition:all 0.3s}
+.btn-wa:disabled{background:#6b7280 !important;cursor:not-allowed !important;opacity:0.6 !important;color:#fff !important;transform:none !important}
 .prev,.next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(212,175,55,0.9);color:#000;border:none;padding:12px 15px;border-radius:50%;z-index:10;cursor:pointer}
 .prev{left:10px}.next{right:10px}
 .dots{text-align:center;padding:12px;background:#1a2a4a}
@@ -48,10 +49,10 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 .menu-item h3{margin:0;color:#1a2a4a;font-size:14px;font-weight:600}
 .katalog-title{color:#d4af37;margin:30px 0 15px 0;font-size:18px;font-weight:700;border-left:4px solid #d4af37;padding-left:10px}
 .katalog-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.katalog-card{background:white;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:0.3s}
+.katalog-card{background:white;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:0.3s;display:flex;flex-direction:column}
 .katalog-card:hover{transform:translateY(-5px)}
 .katalog-card img{width:100%;height:160px;object-fit:cover;background:#000}
-.katalog-info{padding:12px}
+.katalog-info{padding:12px;flex:1}
 .katalog-info h4{margin:0 0 5px 0;font-size:15px;color:#1a2a4a}
 .katalog-info .harga{font-size:16px;color:#e53935;font-weight:700}
 .status-ada{background:#e8f5e9;color:#2e7d32;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold}
@@ -127,14 +128,29 @@ function renderAll(){
 }
 
 function renderSlider(){
-  let slidesContainer=document.getElementById('slidesContainer'); let dotsContainer=document.getElementById('dotsContainer');
-  if(dataMobil.length==0){ document.getElementById('sliderMobil').innerHTML='<div style="text-align:center;padding:80px;color:#d4af37;">Belum ada data armada di rental2026<br>Isi di menu Data Armada Beb</div>'; return; }
+  let slidesContainer=document.getElementById('slidesContainer'); 
+  let dotsContainer=document.getElementById('dotsContainer');
+  if(dataMobil.length==0){ 
+    document.getElementById('sliderMobil').innerHTML='<div style="text-align:center;padding:80px;color:#d4af37;">Belum ada data armada di rental2026<br>Isi di menu Data Armada Beb</div>'; 
+    return; 
+  }
   slidesContainer.innerHTML=''; dotsContainer.innerHTML='';
   dataMobil.forEach((m,i)=>{
     let foto=m.foto_mobil||m.foto||'https://placehold.co/600x380/0a1629/d4af37?text=Belum+Ada+Foto';
     let harga=parseInt(m.harga||0).toLocaleString('id-ID');
     let namaMobil=`${m.merk||''} ${m.type||''} ${m.tahun||''}`;
-    slidesContainer.innerHTML+=`<div class="slide"><div class="slide-img"><img src="${foto}"></div><div class="slide-info"><div><h3>${namaMobil}</h3><span class="plat">${m.plat||'-'}</span> ${getStatus(m.status)}<div class="detail-grid"><span>Tahun</span><span>${m.tahun||'-'}</span><span>Warna</span><span>${m.warna||'-'}</span><span>CC</span><span>${m.cc||'-'} CC</span><span>Penumpang</span><span>${m.penumpang||'-'} Orang</span></div></div><div><div class="harga-box"><div>HARGA SEWA / HARI</div><div class="value">Rp ${harga}</div></div><button class="btn-wa btnBooking" data-nama="${namaMobil}" data-harga="${m.harga}" data-plat="${m.plat}">📱 BOOKING VIA WHATSAPP</button></div></div></div>`;
+    let statusUpper = String(m.status||'ADA').toUpperCase();
+    let isKeluar = statusUpper === 'KELUAR';
+    
+    // ==== FIX BEB: DISABLE BOOKING KALO KELUAR ====
+    let btnBookingHtml = '';
+    if(isKeluar){
+      btnBookingHtml = `<button class="btn-wa" disabled style="background:#6b7280 !important;cursor:not-allowed !important;opacity:0.6;color:#fff;width:100%">⛔ SEDANG DISEWA - KELUAR</button>`;
+    } else {
+      btnBookingHtml = `<button class="btn-wa btnBooking" data-nama="${namaMobil}" data-harga="${m.harga}" data-plat="${m.plat}" style="width:100%">📱 BOOKING VIA WHATSAPP</button>`;
+    }
+
+    slidesContainer.innerHTML+=`<div class="slide"><div class="slide-img"><img src="${foto}"></div><div class="slide-info"><div><h3>${namaMobil}</h3><span class="plat">${m.plat||'-'}</span> ${getStatus(m.status)}<div class="detail-grid"><span>Tahun</span><span>${m.tahun||'-'}</span><span>Warna</span><span>${m.warna||'-'}</span><span>CC</span><span>${m.cc||'-'} CC</span><span>Penumpang</span><span>${m.penumpang||'-'} Orang</span></div></div><div><div class="harga-box"><div>HARGA SEWA / HARI</div><div class="value">Rp ${harga}</div></div>${btnBookingHtml}</div></div></div>`;
     dotsContainer.innerHTML+=`<span class="dot" onclick="currentSlide(${i+1})"></span>`;
   });
   showSlides(slideIndex);
@@ -147,11 +163,17 @@ function renderKatalog(){
   dataMobil.forEach(m=>{
     let foto=m.foto_mobil||m.foto||'https://placehold.co/300x160/0a1629/d4af37?text=No+Foto';
     let harga=parseInt(m.harga||0).toLocaleString('id-ID');
-    container.innerHTML+=`<div class="katalog-card"><img src="${foto}"><div class="katalog-info"><h4>${m.merk||''} ${m.type||''}</h4><div style="font-size:12px;color:#666;">No Pol: ${m.plat||'-'} | ${m.tahun||''}</div><div class="harga">Rp ${harga}/Hari</div>${getStatus(m.status)}</div></div>`;
+    let statusUpper = String(m.status||'ADA').toUpperCase();
+    let isKeluar = statusUpper === 'KELUAR';
+    let btnKatalog = isKeluar 
+      ? `<div style="background:#6b7280;color:#fff;padding:10px;text-align:center;font-size:12px;font-weight:bold">⛔ TIDAK TERSEDIA - KELUAR</div>`
+      : `<button class="btn-wa btnBooking" data-nama="${m.merk||''} ${m.type||''}" data-harga="${m.harga}" data-plat="${m.plat}" style="width:100%;padding:10px;font-size:12px;border-radius:0 0 8px 8px">📱 BOOKING</button>`;
+    
+    container.innerHTML+=`<div class="katalog-card"><img src="${foto}"><div class="katalog-info"><h4>${m.merk||''} ${m.type||''}</h4><div style="font-size:12px;color:#666;">No Pol: ${m.plat||'-'} | ${m.tahun||''}</div><div class="harga">Rp ${harga}/Hari</div>${getStatus(m.status)}</div>${btnKatalog}</div>`;
   });
 }
 
-// LISTEN FIREBASE - INI KUNCINYA BEB
+// LISTEN FIREBASE
 onSnapshot(collection(db,"armada"), (snap)=>{
   dataMobil=[]; snap.forEach(d=> dataMobil.push({id:d.id, ...d.data()})); renderAll();
 });
@@ -173,11 +195,23 @@ setInterval(()=>{geserSlide(1)},5000);
 
 document.addEventListener('click',function(e){
   if(e.target&&e.target.classList.contains('btnBooking')){
-    e.preventDefault(); const btn=e.target; const namaMobil=btn.getAttribute('data-nama'); const harga=btn.getAttribute('data-harga'); const plat=btn.getAttribute('data-plat');
-    const tgl=prompt(`Booking ${namaMobil}\nPlat: ${plat}\nMau sewa tanggal berapa?`); if(!tgl) return;
+    // DOUBLE CHECK BEB: JANGAN SAMPE Lolos Beb kalo Keluar Beb
+    if(e.target.disabled) return;
+    e.preventDefault(); 
+    const btn=e.target; 
+    const namaMobil=btn.getAttribute('data-nama'); 
+    const harga=btn.getAttribute('data-harga'); 
+    const plat=btn.getAttribute('data-plat');
+    const tgl=prompt(`Booking ${namaMobil}\nPlat: ${plat}\nMau sewa tanggal berapa?`); 
+    if(!tgl) return;
     const pesan=`🔔 BOOKING BARU MASUK!\n\nMobil: ${namaMobil}\nPlat: ${plat}\nHarga: Rp${Number(harga).toLocaleString('id-ID')}/hari\nTanggal Sewa: ${tgl}\n\nSegera konfirmasi ya 🙏`;
-    let formdata=new FormData(); formdata.append("target",NOMOR_WA_ADMIN); formdata.append("message",pesan);
-    fetch("https://api.fonnte.com/send",{method:"POST",headers:{"Authorization":WA_TOKEN},body:formdata}).then(res=>res.json()).then(data=>{if(data.status==true){alert("✅ Booking terkirim ke Admin!")}else{alert("❌ Gagal: "+data.reason)}}).catch(err=>alert("❌ Error: "+err));
+    let formdata=new FormData(); 
+    formdata.append("target",NOMOR_WA_ADMIN); 
+    formdata.append("message",pesan);
+    fetch("https://api.fonnte.com/send",{method:"POST",headers:{"Authorization":WA_TOKEN},body:formdata})
+    .then(res=>res.json())
+    .then(data=>{if(data.status==true){alert("✅ Booking terkirim ke Admin!")}else{alert("❌ Gagal: "+data.reason)}})
+    .catch(err=>alert("❌ Error: "+err));
   }
 });
 </script>
