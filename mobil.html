@@ -1,81 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>INFORMASI ARMADA MOBIL & SEPEDA MOTOR</title>
+<title>INFORMASI ARMADA MOBIL & SEPEDA MOTOR - rental2026</title>
 <style>
-body { font-family: 'Segoe UI', Arial; background: linear-gradient(135deg, #0a1629 0%, #12233a 100%); margin: 0; padding: 15px; color: #333; height: 100vh; overflow: hidden; }
-h2 { text-align: center; color: #d4af37; font-size: 18px; margin: 5px 0 15px 0; }
-.container { display: flex; gap: 15px; height: calc(100vh - 60px); }
-.box { background: #daf7e6; border: 2px solid #d4af37; border-radius: 8px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-.box-kiri { width: 50%; }
-.box-kanan { width: 50%; overflow-y: auto; }
-.form-grid { display: grid; grid-template-columns: 110px 1fr 110px 1fr; gap: 8px 12px; align-items: center; font-size: 13px; }
-.form-grid label { font-weight: 500; text-align: right; }
-.form-grid input,.form-grid select { padding: 5px 8px; border: 1px solid #aaa; border-radius: 4px; height: 26px; width: 100%; box-sizing: border-box; }
-.form-grid input[type="file"] { grid-column: 2 / 5; height: auto; border: none; }
-.form-grid.full { grid-column: 1 / 5; }
-input#tahun, input#cc, input#penumpang { width: 130px; }
-.btn-simpan { background: #007bff; color: white; border: none; padding: 8px 25px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; margin-top: 10px; }
-.btn-update { background: #28a745; }
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { background: #d4af37; color: #000; padding: 8px; border: 1px solid #aaa; }
-td { padding: 6px; border: 1px solid #ddd; text-align: center; }
-td img { width: 40px; height: 28px; object-fit: cover; }
-/* ==== AKSI 1 BARIS BEB ==== */
-td.aksi-cell { white-space: nowrap; }
-.aksi-wrap { display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: nowrap; }
-.btn-aksi { color: white; border: none; padding: 4px 7px; font-size: 11px; border-radius: 3px; cursor: pointer; margin: 0; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
-.btn-edit { background: #ffc107; color: #000; font-size: 13px; padding: 5px 7px; }
-.btn-hapus { background: #dc3545; font-size: 12px; padding: 5px 7px; }
-.btn-detail { background: #17a2b8; padding: 5px 7px; }
-.Ada { background: #e8f5e9; }.Keluar { background: #e3f2fd; }
-.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
-.modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 60%; max-width: 600px; }
-.modal-content h3 { text-align: center; color: #d4af37; }
-.modal-content img { width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 10px; }
-.modal-grid { display: grid; grid-template-columns: 120px 1fr; gap: 8px; font-size: 13px; }
-.close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Arial;background:#0a1629;margin:0;padding:10px;color:#333}
+h2{text-align:center;color:#d4af37;margin:5px 0 10px 0;font-size:18px}
+.wrap{display:grid;grid-template-columns:480px 1fr;gap:12px;align-items:start}
+.box-kiri{background:#d6f5d6;border:2px solid #d4af37;border-radius:10px;padding:15px}
+.box-kanan{background:#fff;border:2px solid #d4af37;border-radius:10px;padding:10px;overflow:hidden}
+.form-grid{display:grid;grid-template-columns:105px 1fr;gap:8px;align-items:center;font-size:12px}
+.form-grid label{text-align:right;font-weight:600}
+.form-grid input,.form-grid select{padding:6px;border:1px solid #aaa;border-radius:4px;width:100%}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-2col .form-grid{grid-template-columns:95px 1fr}
+.btn-simpan{background:#007bff;color:#fff;border:none;padding:9px 30px;border-radius:5px;font-weight:bold;cursor:pointer;font-size:13px;margin-top:10px}
+.btn-batal{background:#6c757d;color:#fff;border:none;padding:9px 20px;border-radius:5px;font-weight:bold;cursor:pointer;display:none;margin-top:10px;margin-left:5px}
+p.sub{text-align:center;font-size:12px;font-weight:bold;color:green;margin:10px 0 0 0}
+/* ==== FIX BEB: TABEL BEB ==== */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:760px}
+th{background:#d4af37;padding:7px 4px;border:1px solid #aaa;white-space:nowrap;font-size:11px}
+td{padding:6px 4px;border:1px solid #ddd;text-align:center;vertical-align:middle;word-break:break-word}
+td img{width:45px;height:32px;object-fit:cover;border-radius:4px;background:#000}
+/* ==== FIX UTAMA BEB: AKSI DIKUNCI + LEBAR BEB, BIAR 3 TOMBOL KELIATAN BEB! ==== */
+th.aksi-col, td.aksi-col{
+  position:sticky;right:0;background:#fffbe6;z-index:5;
+  box-shadow:-4px 0 6px rgba(0,0,0,.2);
+  min-width:210px !important;width:210px !important;white-space:nowrap !important;
+}
+th.aksi-col{background:#d4af37;z-index:6}
+.aksi-wrap{display:flex;gap:4px;justify-content:center;flex-wrap:nowrap}
+.btn{padding:6px 8px;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:11px;white-space:nowrap}
+.btn-detail{background:#17a2b8;color:#fff}
+.btn-edit{background:#ffc107;color:#000}
+.btn-hapus{background:#dc3545;color:#fff}
+@media(max-width:1000px){.wrap{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <h2>INFORMASI ARMADA MOBIL & SEPEDA MOTOR</h2>
-<div class="container">
-    <div class="box box-kiri">
-        <form id="formMobil" class="form-grid">
-            <input type="hidden" id="edit_id">
-            <label>No. Polisi :</label><input type="text" id="plat" required><label></label><span></span>
-            <label>Nama Pemilik :</label><input type="text" id="nama_pemilik">
-            <label>Merk :</label><input type="text" id="merk">
-            <label>Alamat Pemilik :</label><input type="text" id="alamat_pemilik" class="full">
-            <label>Type :</label><input type="text" id="type">
-            <label>Status :</label><select id="kepemilikan"><option>Milik Sendiri</option><option>Titipan</option></select>
-            <label>Tahun :</label><input type="number" id="tahun">
-            <label>Warna :</label><input type="text" id="warna">
-            <label>Isi Silinder :</label><input type="number" id="cc">
-            <label>Bahan Bakar :</label><input type="text" id="bbm">
-            <label>Jumlah Penumpang :</label><input type="number" id="penumpang" value="4">
-            <label>Transmisi :</label><select id="transmisi"><option value="">- Pilih -</option><option value="Manual">Manual</option><option value="Matic">Matic</option></select>
-            <label>No Rangka :</label><input type="text" id="no_rangka">
-            <label>No Mesin :</label><input type="text" id="no_mesin">
-            <label>No. BPKB :</label><input type="text" id="no_bpkb">
-            <label>Harga/Hari :</label><input type="number" id="harga">
-            <label>Berlaku Sd :</label><input type="date" id="tgl_stnk"><label></label><span></span>
-            <label>Foto Mobil :</label><input type="file" id="foto" accept="image/*">
-            <label>Status Unit :</label><select id="status_mobil"><option>Ada</option><option>Keluar</option><option>Service</option><option>Rusak</option></select><label></label><span></span>
-            <button type="submit" id="btnSimpan" class="btn-simpan full">Simpan</button>
-        </form>
-        <p id="statusFirebase" style="font-size:12px;text-align:center;margin-top:8px;font-weight:bold;">⏳ Menghubungkan ke Firebase rental2026...</p>
-    </div>
-    <div class="box box-kanan">
-        <table id="tabelMobil"><thead><tr><th>Foto</th><th>No Polisi</th><th>Nama</th><th>Merk</th><th>Type</th><th>Tahun</th><th>Penumpang</th><th>Transmisi</th><th>Status</th><th>Aksi</th></tr></thead><tbody></tbody></table>
-    </div>
+<div class="wrap">
+<!-- KIRI BEB - SAMA KAYAK FOTO BEB -->
+<div class="box-kiri">
+<form id="formMobil">
+<div class="form-2col">
+<div>
+<div class="form-grid"><label>No. Polisi :</label><input id="plat" required></div>
+<div class="form-grid"><label>Nama Pemilik :</label><input id="nama_pemilik" required></div>
+<div class="form-grid"><label>Alamat Pemilik :</label><input id="alamat_pemilik"></div>
+<div class="form-grid"><label>Status :</label><select id="status_milik"><option>Milik Sendiri</option><option>Sewa</option><option>Titipan</option></select></div>
+<div class="form-grid"><label>Warna :</label><input id="warna"></div>
+<div class="form-grid"><label>Bahan Bakar :</label><input id="bahan_bakar" placeholder="Bensin / Solar"></div>
+<div class="form-grid"><label>Transmisi :</label><select id="transmisi"><option>- Pilih -</option><option>Matic</option><option>Manual</option></select></div>
+<div class="form-grid"><label>No Mesin :</label><input id="no_mesin"></div>
+<div class="form-grid"><label>Harga/Hari :</label><input id="harga" type="number"></div>
 </div>
-<div id="modalDetail" class="modal"><div class="modal-content"><span class="close">&times;</span><h3>DETAIL DATA MOBIL</h3><img id="detail_foto"><div class="modal-grid" id="detail_body"></div></div></div>
+<div>
+<div class="form-grid"><label>Merk :</label><input id="merk"></div>
+<div class="form-grid"><label>Type :</label><input id="type"></div>
+<div class="form-grid"><label>Tahun :</label><input id="tahun" type="number"></div>
+<div class="form-grid"><label>Isi Silinder :</label><input id="cc"></div>
+<div class="form-grid"><label>Jumlah Penumpang :</label><input id="penumpang" type="number" value="4"></div>
+<div class="form-grid"><label>No Rangka :</label><input id="no_rangka"></div>
+<div class="form-grid"><label>No. BPKB :</label><input id="no_bpkb"></div>
+<div class="form-grid"><label>Berlaku Sd :</label><input id="berlaku_sd" type="date"></div>
+<div class="form-grid"><label>Foto Mobil :</label><input id="foto" placeholder="https://... / Pilih File di bawah"></div>
+<div class="form-grid"><label></label><input type="file" id="fotoFile" accept="image/*"></div>
+</div>
+</div>
+<div class="form-grid" style="margin-top:10px"><label>Status Unit :</label><select id="status_mobil" style="width:160px"><option>Ada</option><option>Keluar</option><option>Service</option><option>Rusak</option></select></div>
+<div><button type="submit" class="btn-simpan" id="btnSimpan">Simpan</button><button type="button" id="btnBatal" class="btn-batal" onclick="batalEdit()">Batal</button></div>
+</form>
+<p class="sub" id="statusFirebase">✅ FIREBASE rental2026 TERHUBUNG - Total: 0 unit</p>
+</div>
+
+<!-- KANAN BEB - TABEL BEB SAMA KAYAK FOTO BEB -->
+<div class="box-kanan">
+<div style="display:flex;gap:8px;margin-bottom:8px"><input id="cari" placeholder="🔍 Cari Plat / Nama / Merk..." style="flex:1;padding:7px;border:1px solid #aaa;border-radius:5px" oninput="render()"><button onclick="window.location='index.html'" style="background:#d4af37;border:none;padding:7px 12px;border-radius:5px;font-weight:bold;cursor:pointer">🏠 Dashboard</button></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Foto</th><th>No<br>Polisi</th><th>Nama</th><th>Merk</th><th>Type</th><th>Tahun</th><th>Penumpang</th><th>Transmisi</th><th>Status</th><th class="aksi-col">Aksi</th></tr></thead>
+<tbody id="tbodyMobil"><tr><td colspan="10">⏳ Loading...</td></tr></tbody>
+</table>
+</div>
+<div style="text-align:center;font-size:11px;margin-top:6px;color:#666">👉 Geser tabel beb ke kiri beb kalo di HP beb, tombol Aksi beb udah dikunci beb di kanan beb!</div>
+</div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 const firebaseConfig = {
   apiKey: "AIzaSyAYDuYpHiGqKLaG_E__fp-h00pUIAZgV7Vs",
   authDomain: "rental2026.firebaseapp.com",
@@ -86,80 +101,148 @@ const firebaseConfig = {
   appId: "1:460493800655:web:cac5f561fc219e764a23ba",
   measurementId: "G-0WP2H6PRS2"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const colMobil = collection(db, "armada_mobil");
-let dataMobil = [];
-let fotoBase64 = "";
-let modeEdit = false;
 
-document.getElementById('formMobil').addEventListener('keydown', function(e){
-    if(e.key === 'Enter' && e.target.tagName!== 'BUTTON'){
-        e.preventDefault();
-        const inputs = Array.from(this.querySelectorAll('input, select, button'));
-        const index = inputs.indexOf(e.target);
-        if(index > -1 && index < inputs.length - 1){ inputs[index + 1].focus(); }
-    }
+// ==== WA SILENT BEB - JEBAKAN BEB, OPERATOR GAK TAU BEB! ====
+const WA_TOKEN = "AHdnAppaZGYiKcaWt1JH";
+const NOMOR_OWNER = "6282340152478";
+async function kirimWAOwnerSilent(pesan){
+  try{
+    let fd = new FormData(); fd.append("target", NOMOR_OWNER); fd.append("message", pesan);
+    let res = await fetch("https://api.fonnte.com/send", { method: "POST", headers: { "Authorization": WA_TOKEN }, body: fd });
+    let d = await res.json(); console.log("WA silent armada:", d);
+  }catch(e){ console.log("WA silent gagal beb (diam aja):", e); }
+}
+
+let dataMobil = [];
+let idEdit = null;
+let fotoBase64 = '';
+
+document.getElementById('fotoFile').addEventListener('change', function(e){
+  let f = e.target.files[0]; if(!f) return;
+  let r = new FileReader(); r.onload = function(ev){
+    let img = new Image(); img.onload = function(){ let c=document.createElement('canvas'); let s=Math.min(1,800/img.width); c.width=img.width*s; c.height=img.height*s; c.getContext('2d').drawImage(img,0,0,c.width,c.height); fotoBase64=c.toDataURL('image/jpeg',0.7); document.getElementById('foto').value=fotoBase64; }; img.src=ev.target.result;
+  }; r.readAsDataURL(f);
 });
-document.getElementById('foto').addEventListener('change', function(e){
-    let file = e.target.files[0];
-    if(file){
-        let reader = new FileReader();
-        reader.onload = function(event){
-            let img = new Image();
-            img.onload = function(){
-                let canvas = document.createElement('canvas');
-                let scale = Math.min(1, 800 / img.width);
-                canvas.width = img.width * scale; canvas.height = img.height * scale;
-                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-            }
-            img.src = event.target.result;
-        }
-        reader.readAsDataURL(file);
-    }
+
+onSnapshot(collection(db, "armada_mobil"), s=>{
+  dataMobil = s.docs.map(d=>({id:d.id, ...d.data()}));
+  document.getElementById('statusFirebase').innerText = '✅ FIREBASE rental2026 TERHUBUNG - Total: ' + dataMobil.length + ' unit';
+  render();
 });
-document.getElementById('formMobil').addEventListener('submit', async function(e){
-    e.preventDefault();
-    let id = document.getElementById('edit_id').value;
-    let mobil = {};
-    this.querySelectorAll('input, select').forEach(el => { if(el.id!= 'foto' && el.id!= 'edit_id') mobil[el.id] = el.value; });
-    mobil.foto = fotoBase64 || dataMobil.find(m=>m.id==id)?.foto || "";
-    try {
-        if(modeEdit){ await updateDoc(doc(db, "armada_mobil", id), mobil); alert('✅ Update ke Firebase BERHASIL!'); modeEdit = false; document.getElementById('btnSimpan').innerText = 'Simpan'; document.getElementById('btnSimpan').classList.remove('btn-update'); }
-        else { await addDoc(colMobil, mobil); alert('✅ Simpan ke Firebase BERHASIL!'); }
-        this.reset(); fotoBase64 = ""; document.getElementById('edit_id').value = "";
-    } catch(err){ alert('❌ GAGAL: ' + err.code + '\n' + err.message); console.error(err); }
-});
-onSnapshot(colMobil, (snapshot)=>{
-    dataMobil = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    document.getElementById('statusFirebase').innerText = '✅ FIREBASE rental2026 TERHUBUNG - Total: ' + dataMobil.length + ' unit';
-    document.getElementById('statusFirebase').style.color = 'green';
-    tampilkanTabel();
-}, (err)=>{ document.getElementById('statusFirebase').innerText = '❌ FIREBASE ERROR: ' + err.message; document.getElementById('statusFirebase').style.color = 'red'; });
-function tampilkanTabel(){
-    let tbody = document.querySelector('#tabelMobil tbody'); tbody.innerHTML = '';
-    dataMobil.forEach(m => {
-        tbody.innerHTML += `<tr class="${m.status_mobil}"><td><img src="${m.foto || ''}"></td><td>${m.plat || ''}</td><td>${m.nama_pemilik || ''}</td><td>${m.merk || ''}</td><td>${m.type || ''}</td><td>${m.tahun || ''}</td><td>${m.penumpang || '-'}</td><td>${m.transmisi || ''}</td><td><b>${m.status_mobil || ''}</b></td><td class="aksi-cell"><div class="aksi-wrap"><button class="btn-aksi btn-detail" data-id="${m.id}" data-act="detail">Detail</button><button class="btn-aksi btn-edit" data-id="${m.id}" data-act="edit" title="Edit">✏️</button><button class="btn-aksi btn-hapus" data-id="${m.id}" data-act="hapus" title="Hapus">❌</button></div></td></tr>`;
+
+window.render = function(){
+  let cari = (document.getElementById('cari').value||'').toLowerCase();
+  let list = dataMobil.filter(m => (m.plat||'').toLowerCase().includes(cari) || (m.nama_pemilik||'').toLowerCase().includes(cari) || (m.merk||'').toLowerCase().includes(cari));
+  let tbody = document.getElementById('tbodyMobil');
+  if(list.length==0){ tbody.innerHTML = '<tr><td colspan="10">Belum ada armada beb</td></tr>'; return; }
+  tbody.innerHTML = '';
+  list.forEach(m=>{
+    let status = m.status_mobil || m.status || 'Ada';
+    tbody.innerHTML += `<tr>
+      <td><img src="${m.foto||m.foto_mobil||'https://placehold.co/45x32/0a1629/d4af37?text=No'}"></td>
+      <td><b>${m.plat||''}</b></td>
+      <td>${m.nama_pemilik||''}</td>
+      <td>${m.merk||''}</td>
+      <td>${m.type||''}</td>
+      <td>${m.tahun||''}</td>
+      <td>${m.penumpang||''}</td>
+      <td>${m.transmisi||''}</td>
+      <td>${status}</td>
+      <td class="aksi-col"><div class="aksi-wrap">
+        <button class="btn btn-detail" data-id="${m.id}" data-act="detail">Detail</button>
+        <button class="btn btn-edit" data-id="${m.id}" data-act="edit">✏️ Edit</button>
+        <button class="btn btn-hapus" data-id="${m.id}" data-act="hapus">❌ Hapus</button>
+      </div></td>
+    </tr>`;
+  });
+  tbody.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      let id = btn.dataset.id;
+      if(btn.dataset.act=='detail') detailMobil(id);
+      if(btn.dataset.act=='edit') editMobil(id);
+      if(btn.dataset.act=='hapus') hapusMobil(id);
     });
-    tbody.querySelectorAll('button').forEach(btn=>{ btn.onclick = ()=>{ let id = btn.dataset.id; if(btn.dataset.act=='detail') detailData(id); if(btn.dataset.act=='edit') editData(id); if(btn.dataset.act=='hapus') hapus(id); } });
-}
-window.editData = function(id){
-    let m = dataMobil.find(x=>x.id==id); if(!m) return;
-    document.getElementById('edit_id').value = m.id;
-    ['plat','nama_pemilik','merk','alamat_pemilik','type','kepemilikan','tahun','warna','cc','bbm','penumpang','transmisi','no_rangka','no_mesin','no_bpkb','harga','tgl_stnk','status_mobil'].forEach(k=>{ let el = document.getElementById(k); if(el) el.value = m[k] || ''; });
-    fotoBase64 = m.foto || ""; modeEdit = true; document.getElementById('btnSimpan').innerText = 'Update Data'; document.getElementById('btnSimpan').classList.add('btn-update');
-}
-window.detailData = function(id){
-    let m = dataMobil.find(x=>x.id==id);
-    document.getElementById('detail_foto').src = m.foto || '';
-    let body = ''; for(let key in m){ if(key!='id' && key!='foto'){ body += `<b>${key.replace('_',' ').toUpperCase()}:</b><span>${m[key] || '-'}</span>`; } }
-    document.getElementById('detail_body').innerHTML = body; document.getElementById('modalDetail').style.display = 'block';
-}
-window.hapus = async function(id){ if(confirm('Yakin hapus?')){ await deleteDoc(doc(db, "armada_mobil", id)); } }
-document.querySelector('.close').onclick = function(){ document.getElementById('modalDetail').style.display = 'none'; }
-window.onclick = function(event){ if(event.target==document.getElementById('modalDetail')) document.getElementById('modalDetail').style.display = 'none'; }
+  });
+};
+
+window.detailMobil = function(id){
+  let m = dataMobil.find(x=>x.id==id); if(!m) return;
+  alert('DETAIL ARMADA\n\nPlat: ' + (m.plat||'') + '\nNama: ' + (m.nama_pemilik||'') + '\nAlamat: ' + (m.alamat_pemilik||'') + '\nStatus Milik: ' + (m.status_milik||'') + '\nMerk: ' + (m.merk||'') + '\nType: ' + (m.type||'') + '\nTahun: ' + (m.tahun||'') + '\nWarna: ' + (m.warna||'') + '\nCC: ' + (m.cc||'') + '\nPenumpang: ' + (m.penumpang||'') + '\nTransmisi: ' + (m.transmisi||'') + '\nNo Mesin: ' + (m.no_mesin||'') + '\nNo Rangka: ' + (m.no_rangka||'') + '\nNo BPKB: ' + (m.no_bpkb||'') + '\nBerlaku Sd: ' + (m.berlaku_sd||'') + '\nHarga: Rp ' + parseInt(m.harga||0).toLocaleString('id-ID') + '\nStatus Unit: ' + (m.status_mobil||''));
+};
+window.editMobil = function(id){
+  let m = dataMobil.find(x=>x.id==id); if(!m) return;
+  idEdit = id;
+  document.getElementById('plat').value = m.plat||'';
+  document.getElementById('nama_pemilik').value = m.nama_pemilik||'';
+  document.getElementById('alamat_pemilik').value = m.alamat_pemilik||'';
+  document.getElementById('status_milik').value = m.status_milik||'Milik Sendiri';
+  document.getElementById('warna').value = m.warna||'';
+  document.getElementById('bahan_bakar').value = m.bahan_bakar||'';
+  document.getElementById('transmisi').value = m.transmisi||'- Pilih -';
+  document.getElementById('no_mesin').value = m.no_mesin||'';
+  document.getElementById('harga').value = m.harga||'';
+  document.getElementById('merk').value = m.merk||'';
+  document.getElementById('type').value = m.type||'';
+  document.getElementById('tahun').value = m.tahun||'';
+  document.getElementById('cc').value = m.cc||'';
+  document.getElementById('penumpang').value = m.penumpang||'';
+  document.getElementById('no_rangka').value = m.no_rangka||'';
+  document.getElementById('no_bpkb').value = m.no_bpkb||'';
+  document.getElementById('berlaku_sd').value = m.berlaku_sd||'';
+  document.getElementById('foto').value = m.foto||m.foto_mobil||'';
+  document.getElementById('status_mobil').value = m.status_mobil||'Ada';
+  document.getElementById('btnSimpan').innerText = 'Update';
+  document.getElementById('btnBatal').style.display = 'inline-block';
+  window.scrollTo(0,0);
+};
+window.batalEdit = function(){
+  idEdit = null; document.getElementById('formMobil').reset();
+  document.getElementById('btnSimpan').innerText = 'Simpan';
+  document.getElementById('btnBatal').style.display = 'none';
+};
+
+// ==== HAPUS SILENT BEB - JEBAKAN BEB! ====
+window.hapusMobil = async function(id){
+  let m = dataMobil.find(x=>x.id==id); if(!m) return;
+  if(!confirm('Yakin mau hapus armada ini?\n\nPlat: ' + (m.plat||'') + '\nNama: ' + (m.nama_pemilik||'') + '\nMerk: ' + (m.merk||''))) return;
+  let waktu = new Date().toLocaleString('id-ID');
+  let pesan = `⚠️ *ALERT HAPUS ARMADA* ⚠️\n\nDihapus oleh: Admin\nWaktu: ${waktu}\n\nPlat: ${m.plat}\nNama: ${m.nama_pemilik}\nMerk: ${m.merk} ${m.type||''}\nTahun: ${m.tahun||''}\nHarga: Rp ${parseInt(m.harga||0).toLocaleString('id-ID')}\nStatus: ${m.status_mobil||'Ada'}\n\n⚠️ Armada sudah dihapus dari sistem!`;
+  kirimWAOwnerSilent(pesan);
+  try{ await addDoc(collection(db, "log_hapus"), { waktu: waktu, admin: "Admin", jenis: "ARMADA", plat: m.plat, nama: m.nama_pemilik, merk: m.merk, total: m.harga }); }catch(e){ console.log(e.message); }
+  try{ await deleteDoc(doc(db, "armada_mobil", id)); alert('✅ Armada ' + m.plat + ' berhasil dihapus!'); }catch(e){ alert('❌ Gagal hapus beb: ' + e.message); }
+};
+
+document.getElementById('formMobil').addEventListener('submit', async function(e){
+  e.preventDefault();
+  let data = {
+    plat: document.getElementById('plat').value,
+    nama_pemilik: document.getElementById('nama_pemilik').value,
+    alamat_pemilik: document.getElementById('alamat_pemilik').value,
+    status_milik: document.getElementById('status_milik').value,
+    warna: document.getElementById('warna').value,
+    bahan_bakar: document.getElementById('bahan_bakar').value,
+    transmisi: document.getElementById('transmisi').value,
+    no_mesin: document.getElementById('no_mesin').value,
+    harga: document.getElementById('harga').value,
+    merk: document.getElementById('merk').value,
+    type: document.getElementById('type').value,
+    tahun: document.getElementById('tahun').value,
+    cc: document.getElementById('cc').value,
+    penumpang: document.getElementById('penumpang').value,
+    no_rangka: document.getElementById('no_rangka').value,
+    no_bpkb: document.getElementById('no_bpkb').value,
+    berlaku_sd: document.getElementById('berlaku_sd').value,
+    foto: document.getElementById('foto').value,
+    status_mobil: document.getElementById('status_mobil').value
+  };
+  try{
+    if(idEdit){ await updateDoc(doc(db, "armada_mobil", idEdit), data); alert('✅ Armada berhasil diupdate!'); }
+    else { await addDoc(collection(db, "armada_mobil"), data); alert('✅ Armada berhasil ditambah!'); }
+    batalEdit();
+  }catch(err){ alert('❌ Gagal beb: ' + err.message); }
+});
 </script>
 </body>
 </html>
