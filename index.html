@@ -73,6 +73,7 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 <div class="box">
 <div class="card-grid"><div class="card"><h4>TOTAL ARMADA</h4><h2 id="total_mobil">0</h2></div><div class="card"><h4>STATUS ADA</h4><h2 id="mobil_ada">0</h2></div><div class="card"><h4>STATUS KELUAR</h4><h2 id="mobil_keluar">0</h2></div><div class="card"><h4>TOTAL TRANSAKSI</h4><h2 id="trx_total">0</h2></div></div>
 <div class="info-armada"><div class="info-card"><span>🚗 Mobil Tersedia Hari Ini</span><span id="mobil_tersedia">0 Unit</span></div><div class="info-card"><span>📅 Mobil Disewa Bulan Ini</span><span id="mobil_disewa_bulan">0 Unit</span></div></div>
+<p id="statusFirebase" style="text-align:center;font-size:12px;font-weight:bold">⏳ Menghubungkan ke Firebase rental2026 - baca armada_mobil REAL...</p>
 <h3 class="menu-title">MENU UTAMA</h3>
 <div class="menu-grid">
 <div class="menu-item" onclick="window.location='mobil.html'"><img src="https://cdn-icons-png.flaticon.com/512/1076/1076965.png"><h3>Data Armada</h3></div>
@@ -89,16 +90,18 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAYDuYpHiGqKLagE__fp-h00pUIAZGv7Vs",
+  apiKey: "AIzaSyAYDuYpHiGqKLaG_E__fp-h00pUIAZgV7Vs",
   authDomain: "rental2026.firebaseapp.com",
+  databaseURL: "https://rental2026-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "rental2026",
   storageBucket: "rental2026.firebasestorage.app",
   messagingSenderId: "460493800655",
-  appId: "1:460493800655:web:cac5f561fc219e764a23ba"
+  appId: "1:460493800655:web:cac5f561fc219e764a23ba",
+  measurementId: "G-0WP2H6PRS2"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -110,12 +113,23 @@ const WA_TOKEN = "AHdnAppaZGYiKcaWt1JH";
 
 document.getElementById('tgl_sekarang').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
-function getStatus(status){let s=(status||'ADA').toLowerCase(); if(s=='keluar') return '<span class="status-keluar">KELUAR</span>'; return '<span class="status-ada">ADA</span>';}
+// ==== FIX BEB: NORMALISASI FIELD BEB - BACA status_mobil ATAU status, foto ATAU foto_mobil ====
+function norm(m){
+  return {
+    ...m,
+    status: m.status_mobil || m.status || 'Ada',
+    foto: m.foto || m.foto_mobil || '',
+    plat: m.plat || m.no_polisi || '-',
+    merk: m.merk || '',
+    type: m.type || '',
+  };
+}
+function getStatus(status){let s=String(status||'ADA').toUpperCase(); if(s=='KELUAR') return '<span class="status-keluar">KELUAR</span>'; if(s=='SERVICE') return '<span class="status-ada" style="background:#fff3cd;color:#856404">SERVICE</span>'; if(s=='RUSAK') return '<span class="status-keluar">RUSAK</span>'; return '<span class="status-ada">ADA</span>';}
 
 function renderAll(){
   let totalArmada=dataMobil.length;
-  let statusAda=dataMobil.filter(m=>String(m.status).toUpperCase()=='ADA').length;
-  let statusKeluar=dataMobil.filter(m=>String(m.status).toUpperCase()=='KELUAR').length;
+  let statusAda=dataMobil.filter(m=>String(m.status||'').toUpperCase()=='ADA').length;
+  let statusKeluar=dataMobil.filter(m=>String(m.status||'').toUpperCase()=='KELUAR').length;
   document.getElementById('total_mobil').innerText=totalArmada;
   document.getElementById('mobil_ada').innerText=statusAda;
   document.getElementById('mobil_keluar').innerText=statusKeluar;
@@ -124,32 +138,31 @@ function renderAll(){
   let bulanIni=new Date().getMonth(); let tahunIni=new Date().getFullYear();
   let mobilDisewaBulan=dataTransaksi.filter(t=>{let d=new Date(t.tgl_sewa||t.created_at); return d.getMonth()==bulanIni && d.getFullYear()==tahunIni;}).length;
   document.getElementById('mobil_disewa_bulan').innerText=mobilDisewaBulan+' Unit';
+  document.getElementById('statusFirebase').innerText = '✅ FIREBASE rental2026 TERHUBUNG - DATA REAL beb! Armada: ' + totalArmada + ' | Ada: ' + statusAda + ' | Keluar: ' + statusKeluar;
+  document.getElementById('statusFirebase').style.color = 'green';
   renderSlider(); renderKatalog();
 }
 
 function renderSlider(){
-  let slidesContainer=document.getElementById('slidesContainer'); 
+  let slidesContainer=document.getElementById('slidesContainer');
   let dotsContainer=document.getElementById('dotsContainer');
-  if(dataMobil.length==0){ 
-    document.getElementById('sliderMobil').innerHTML='<div style="text-align:center;padding:80px;color:#d4af37;">Belum ada data armada di rental2026<br>Isi di menu Data Armada Beb</div>'; 
-    return; 
+  if(dataMobil.length==0){
+    document.getElementById('sliderMobil').innerHTML='<div style="text-align:center;padding:80px;color:#d4af37;">Belum ada data armada di rental2026<br>Isi di menu Data Armada Beb - koleksi armada_mobil</div>';
+    return;
   }
   slidesContainer.innerHTML=''; dotsContainer.innerHTML='';
   dataMobil.forEach((m,i)=>{
-    let foto=m.foto_mobil||m.foto||'https://placehold.co/600x380/0a1629/d4af37?text=Belum+Ada+Foto';
+    let foto=m.foto||'https://placehold.co/600x380/0a1629/d4af37?text=Belum+Ada+Foto';
     let harga=parseInt(m.harga||0).toLocaleString('id-ID');
     let namaMobil=`${m.merk||''} ${m.type||''} ${m.tahun||''}`;
     let statusUpper = String(m.status||'ADA').toUpperCase();
     let isKeluar = statusUpper === 'KELUAR';
-    
-    // ==== FIX BEB: DISABLE BOOKING KALO KELUAR ====
     let btnBookingHtml = '';
     if(isKeluar){
       btnBookingHtml = `<button class="btn-wa" disabled style="background:#6b7280 !important;cursor:not-allowed !important;opacity:0.6;color:#fff;width:100%">⛔ SEDANG DISEWA - KELUAR</button>`;
     } else {
       btnBookingHtml = `<button class="btn-wa btnBooking" data-nama="${namaMobil}" data-harga="${m.harga}" data-plat="${m.plat}" style="width:100%">📱 BOOKING VIA WHATSAPP</button>`;
     }
-
     slidesContainer.innerHTML+=`<div class="slide"><div class="slide-img"><img src="${foto}"></div><div class="slide-info"><div><h3>${namaMobil}</h3><span class="plat">${m.plat||'-'}</span> ${getStatus(m.status)}<div class="detail-grid"><span>Tahun</span><span>${m.tahun||'-'}</span><span>Warna</span><span>${m.warna||'-'}</span><span>CC</span><span>${m.cc||'-'} CC</span><span>Penumpang</span><span>${m.penumpang||'-'} Orang</span></div></div><div><div class="harga-box"><div>HARGA SEWA / HARI</div><div class="value">Rp ${harga}</div></div>${btnBookingHtml}</div></div></div>`;
     dotsContainer.innerHTML+=`<span class="dot" onclick="currentSlide(${i+1})"></span>`;
   });
@@ -161,52 +174,58 @@ function renderKatalog(){
   if(dataMobil.length==0){ container.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:#d4af37;">Belum ada data armada</div>'; return; }
   container.innerHTML='';
   dataMobil.forEach(m=>{
-    let foto=m.foto_mobil||m.foto||'https://placehold.co/300x160/0a1629/d4af37?text=No+Foto';
+    let foto=m.foto||'https://placehold.co/300x160/0a1629/d4af37?text=No+Foto';
     let harga=parseInt(m.harga||0).toLocaleString('id-ID');
     let statusUpper = String(m.status||'ADA').toUpperCase();
     let isKeluar = statusUpper === 'KELUAR';
-    let btnKatalog = isKeluar 
+    let btnKatalog = isKeluar
       ? `<div style="background:#6b7280;color:#fff;padding:10px;text-align:center;font-size:12px;font-weight:bold">⛔ TIDAK TERSEDIA - KELUAR</div>`
       : `<button class="btn-wa btnBooking" data-nama="${m.merk||''} ${m.type||''}" data-harga="${m.harga}" data-plat="${m.plat}" style="width:100%;padding:10px;font-size:12px;border-radius:0 0 8px 8px">📱 BOOKING</button>`;
-    
     container.innerHTML+=`<div class="katalog-card"><img src="${foto}"><div class="katalog-info"><h4>${m.merk||''} ${m.type||''}</h4><div style="font-size:12px;color:#666;">No Pol: ${m.plat||'-'} | ${m.tahun||''}</div><div class="harga">Rp ${harga}/Hari</div>${getStatus(m.status)}</div>${btnKatalog}</div>`;
   });
 }
 
-// LISTEN FIREBASE
-onSnapshot(collection(db,"armada"), (snap)=>{
-  dataMobil=[]; snap.forEach(d=> dataMobil.push({id:d.id, ...d.data()})); renderAll();
-});
+// ==== FIX UTAMA BEB: BACA armada_mobil BUKAN armada BEB! ====
+onSnapshot(collection(db,"armada_mobil"), (snap)=>{
+  dataMobil=[]; snap.forEach(d=> dataMobil.push(norm({id:d.id, ...d.data()}))); renderAll();
+}, (e)=>{ document.getElementById('statusFirebase').innerText = '❌ FIREBASE ERROR: ' + e.message; });
 onSnapshot(collection(db,"transaksi"), (snap)=>{
   dataTransaksi=[]; snap.forEach(d=> dataTransaksi.push({id:d.id, ...d.data()})); renderAll();
 });
+// Log hapus - baca 2 nama beb biar gak ilang beb (log_hapus dari transaksi.html + logHapus lama)
+onSnapshot(collection(db,"log_hapus"), (snap)=>{
+  let logs=[]; snap.forEach(d=> logs.push(d.data()));
+  renderLog(logs);
+});
 onSnapshot(collection(db,"logHapus"), (snap)=>{
   let logs=[]; snap.forEach(d=> logs.push(d.data()));
+  if(logs.length>0) renderLog(logs);
+});
+function renderLog(logs){
   let box=document.getElementById('logHapusBox');
   if(logs.length==0){ box.innerHTML='<p style="text-align:center;color:#856404;margin:0;">Belum ada aktivitas hapus</p>'; return; }
   box.innerHTML=''; logs.sort((a,b)=>new Date(b.waktu)-new Date(a.waktu)).slice(0,10).forEach(log=>{
     box.innerHTML+=`<div style="border-bottom:1px dashed #ffc107;padding:10px 0;font-size:13px;"><div style="display:flex;justify-content:space-between;"><b style="color:#856404;">${log.waktu||''}</b><span style="background:#dc3545;color:white;padding:2px 8px;border-radius:4px;font-size:11px;">DIHAPUS</span></div><div>Admin: <b>${log.admin||''}</b> hapus invoice <b>${log.invoice||''}</b></div><div style="font-size:12px;color:#555;">Customer: ${log.customer||''} | Mobil: ${log.mobil||''} | Total: Rp ${parseInt(log.total||0).toLocaleString('id-ID')}</div></div>`;
   });
-});
+}
 
 window.geserSlide=(n)=>{showSlides(slideIndex+=n)}; window.currentSlide=(n)=>{showSlides(slideIndex=n)};
-function showSlides(n){let slides=document.querySelectorAll(".slide"); let dots=document.querySelectorAll(".dot"); if(!slides.length) return; if(n>slides.length){slideIndex=1} if(n<1){slideIndex=slides.length} document.querySelector(".slides").style.transform=`translateX(-${(slideIndex-1)*100}%)`; dots.forEach(d=>d.classList.remove("active")); if(dots[slideIndex-1]) dots[slideIndex-1].classList.add("active");}
+function showSlides(n){let slides=document.querySelectorAll(".slide"); let dots=document.querySelectorAll(".dot"); if(!slides.length) return; if(n>slides.length){slideIndex=1} if(n<1){slideIndex=slides.length} let el=document.querySelector(".slides"); if(el) el.style.transform=`translateX(-${(slideIndex-1)*100}%)`; dots.forEach(d=>d.classList.remove("active")); if(dots[slideIndex-1]) dots[slideIndex-1].classList.add("active");}
 setInterval(()=>{geserSlide(1)},5000);
 
 document.addEventListener('click',function(e){
   if(e.target&&e.target.classList.contains('btnBooking')){
-    // DOUBLE CHECK BEB: JANGAN SAMPE Lolos Beb kalo Keluar Beb
     if(e.target.disabled) return;
-    e.preventDefault(); 
-    const btn=e.target; 
-    const namaMobil=btn.getAttribute('data-nama'); 
-    const harga=btn.getAttribute('data-harga'); 
+    e.preventDefault();
+    const btn=e.target;
+    const namaMobil=btn.getAttribute('data-nama');
+    const harga=btn.getAttribute('data-harga');
     const plat=btn.getAttribute('data-plat');
-    const tgl=prompt(`Booking ${namaMobil}\nPlat: ${plat}\nMau sewa tanggal berapa?`); 
+    const tgl=prompt(`Booking ${namaMobil}\nPlat: ${plat}\nMau sewa tanggal berapa?`);
     if(!tgl) return;
     const pesan=`🔔 BOOKING BARU MASUK!\n\nMobil: ${namaMobil}\nPlat: ${plat}\nHarga: Rp${Number(harga).toLocaleString('id-ID')}/hari\nTanggal Sewa: ${tgl}\n\nSegera konfirmasi ya 🙏`;
-    let formdata=new FormData(); 
-    formdata.append("target",NOMOR_WA_ADMIN); 
+    let formdata=new FormData();
+    formdata.append("target",NOMOR_WA_ADMIN);
     formdata.append("message",pesan);
     fetch("https://api.fonnte.com/send",{method:"POST",headers:{"Authorization":WA_TOKEN},body:formdata})
     .then(res=>res.json())
