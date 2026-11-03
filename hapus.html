@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>RIWAYAT HAPUS - rental2026 [PRIVATE]</title>
+<style>
+body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#12233a 100%);margin:0;padding:15px}
+.header{background:#d4af37;padding:12px 20px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.box{background:#fff;border:2px solid #d4af37;border-radius:10px;padding:15px;max-width:1200px;margin:auto}
+#logHapusBox{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:15px;max-height:78vh;overflow-y:auto}
+.item{border-bottom:1px dashed #ffc107;padding:14px 0;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.tgl{font-weight:bold;color:#7a5a00;font-size:13px}
+.desc{font-size:12px;color:#333;margin-top:3px;line-height:1.5}
+.btn{padding:8px 14px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block;font-size:12px}
+.btn-home{background:#1a2a4a;color:#fff}
+.btn-clear{background:#dc3545;color:#fff}
+.btn-restore{background:#28a745;color:#fff;padding:6px 10px;border-radius:5px;border:none;cursor:pointer;font-size:11px}
+.btn-print{background:#17a2b8;color:#fff;padding:6px 10px;border-radius:5px;border:none;cursor:pointer;font-size:11px}
+.btn-delete-item{background:#dc3545;color:#fff;padding:6px 10px;border-radius:5px;border:none;cursor:pointer;font-size:11px}
+.aksi{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;max-width:260px;justify-content:flex-end}
+.badge{background:#dc3545;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px}
+input{padding:8px 12px;border:1px solid #aaa;border-radius:6px;flex:1}
+.top{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+#loginBox{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,22,41,0.95);display:flex;justify-content:center;align-items:center;z-index:9999}
+.login-card{background:#fff;border:3px solid #d4af37;border-radius:12px;padding:30px;width:90%;max-width:400px;text-align:center}
+.login-card input{width:100%;padding:12px;margin:10px 0;border:2px solid #d4af37;border-radius:6px;text-align:center}
+.btn-login{background:#d4af37;color:#000;padding:12px;width:100%;border:none;border-radius:6px;font-weight:bold;cursor:pointer}
+.hidden{display:none !important}
+@media print{.no-print{display:none} body{background:#fff}}
+</style>
+</head>
+<body>
+<div id="loginBox">
+<div class="login-card">
+<h2>🔐 AKSES TERBATAS</h2><p>Masukkan KEY untuk buka Riwayat Hapus<br><b>hapus.html</b></p>
+<input type="password" id="inputKey" placeholder="Masukkan KEY...">
+<button class="btn-login" onclick="cekKey()">🔓 BUKA RIWAYAT</button>
+<p style="margin-top:15px;font-size:11px"><a href="index.html" style="color:#1a2a4a;text-decoration:none">← Dashboard</a></p>
+<div id="pesanError" style="color:#dc3545;font-size:12px;font-weight:bold;margin-top:10px;display:none">❌ KEY Salah beb!</div>
+</div>
+</div>
+
+<div class="header"><h2 style="margin:0">🗑️ RIWAYAT HAPUS - rental2026</h2><span id="tgl"></span></div>
+<div class="box">
+<div class="top no-print">
+<input id="cari" placeholder="🔍 Cari: APM/2026/0009 / Plat / Customer..." oninput="render()">
+<a href="index.html" class="btn btn-home">🏠 Dashboard</a>
+<button class="btn btn-clear" onclick="clearAll()">🧹 Semua</button>
+<button class="btn" style="background:#17a2b8;color:#fff" onclick="cetakSemua()">🖨️ Cetak Semua</button>
+<button class="btn" style="background:#6c757d;color:#fff" onclick="logout()">🔒 Logout</button>
+</div>
+<div id="logHapusBox">⏳ Loading dari Firebase rental2026...</div>
+<div id="count" style="text-align:center;font-size:12px;font-weight:bold;color:green;margin-top:10px"></div>
+</div>
+
+<!-- AREA CETAK PREVIEW BEB -->
+<div id="printArea" style="display:none"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot, getDocs, deleteDoc, doc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAYDuYpHiGqKLaG_E__fp-h00pUIAZgV7Vs",
+  authDomain: "rental2026.firebaseapp.com",
+  projectId: "rental2026",
+  storageBucket: "rental2026.firebasestorage.app",
+  messagingSenderId: "460493800655",
+  appId: "1:460493800655:web:cac5f561fc219e764a23ba"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const KEY_BENAR = "28Maret2024*#";
+window.cekKey = function(){
+  let input=document.getElementById('inputKey').value;
+  if(input===KEY_BENAR){document.getElementById('loginBox').classList.add('hidden');sessionStorage.setItem('hapus_login','ok');loadData();}
+  else{document.getElementById('pesanError').style.display='block';document.getElementById('inputKey').value='';}
+}
+document.getElementById('inputKey').addEventListener('keypress', e=>{if(e.key==='Enter') cekKey();});
+window.logout = function(){sessionStorage.removeItem('hapus_login');location.reload();}
+document.getElementById('tgl').innerText=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+if(sessionStorage.getItem('hapus_login')==='ok'){document.getElementById('loginBox').classList.add('hidden');}
+
+let allLogs=[];
+function loadData(){
+  onSnapshot(collection(db,"log_hapus"), snap=>{
+    let logs=[];snap.forEach(d=>logs.push({id:d.id,col:'log_hapus',...d.data()}));
+    allLogs=logs;
+    onSnapshot(collection(db,"logHapus"), snap2=>{
+      let logs2=[];snap2.forEach(d=>logs2.push({id:d.id,col:'logHapus',...d.data()}));
+      let gabung=[...logs,...logs2];
+      let map=new Map();gabung.forEach(x=>map.set(x.id+x.col,x));
+      allLogs=Array.from(map.values());
+      render();
+    });
+    render();
+  });
+}
+if(sessionStorage.getItem('hapus_login')==='ok'){loadData();}
+
+window.render=function(){
+  let cari=(document.getElementById('cari').value||'').toLowerCase();
+  let filtered=allLogs.filter(x=>JSON.stringify(x).toLowerCase().includes(cari));
+  filtered.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+  let box=document.getElementById('logHapusBox');
+  document.getElementById('count').innerText='Total: '+filtered.length+' data terhapus';
+  if(filtered.length==0){box.innerHTML='<div style="text-align:center;padding:20px;color:#856404">Belum ada aktivitas hapus beb</div>';return;}
+  box.innerHTML='';
+  filtered.forEach(l=>{
+    box.innerHTML+=`
+    <div class="item">
+      <div style="flex:1">
+        <div class="tgl">${l.waktu||''}</div>
+        <div class="desc">Admin: <b>${l.admin||'Admin'}</b> hapus ${l.jenis||'invoice'} <b>${l.invoice||l.plat||''}</b><br>Customer: ${l.customer||'-'} | Mobil: ${l.mobil||'-'} | Plat: ${l.plat||'-'} | Total: Rp ${parseInt(l.total||0).toLocaleString('id-ID')}</div>
+      </div>
+      <div class="aksi">
+        <button class="btn-restore" onclick="pulihkan('${l.col}','${l.id}')">♻️ Pulihkan</button>
+        <button class="btn-print" onclick="cetakPreview('${l.col}','${l.id}')">🖨️ Cetak</button>
+        <button class="btn-delete-item" onclick="hapusSatu('${l.col}','${l.id}')">🗑️ Hapus</button>
+      </div>
+    </div>`;
+  });
+}
+
+window.pulihkan=async function(colName,id){
+  let data=allLogs.find(x=>x.id===id&&x.col===colName);
+  if(!data) return alert('Data tidak ketemu beb!');
+  if(!confirm('♻️ Pulihkan '+ (data.invoice||data.plat) +' beb?')) return;
+  try{
+    if(data.data_asli){
+      let targetCol=data.jenis==='invoice'?'transaksi':(data.target_collection||'transaksi');
+      await addDoc(collection(db,targetCol),data.data_asli);
+    }else{
+      await addDoc(collection(db,'transaksi'),{invoice:data.invoice||'',customer:data.customer||'',mobil:data.mobil||'',plat:data.plat||'',total:data.total||0,dipulihkan_dari_hapus:true,waktu_pulih:new Date().toLocaleString('id-ID'),timestamp:Date.now()});
+    }
+    await deleteDoc(doc(db,colName,id));
+    alert('✅ Berhasil dipulihkan beb!');
+  }catch(e){alert('❌ Gagal: '+e.message);}
+}
+window.hapusSatu=async function(colName,id){
+  if(!confirm('Yakin hapus permanen 1 item ini beb?')) return;
+  try{await deleteDoc(doc(db,colName,id));}catch(e){alert('❌ Gagal: '+e.message);}
+}
+
+// CETAK PREVIEW BEB - PER ITEM
+window.cetakPreview=function(colName,id){
+  let d=allLogs.find(x=>x.id===id&&x.col===colName);
+  if(!d) return;
+  let w=window.open('','_blank','width=800,height=600');
+  let isiData=d.data_asli||d;
+  w.document.write(`
+  <html><head><title>CETAK - ${d.invoice||d.plat||''}</title>
+  <style>
+  body{font-family:Arial;padding:20px;color:#000}
+  .header{text-align:center;border-bottom:3px solid #000;padding-bottom:10px;margin-bottom:20px}
+  .header h2{margin:0}
+  .badge{background:#dc3545;color:#fff;padding:4px 10px;border-radius:4px;font-size:12px}
+  table{width:100%;border-collapse:collapse;margin:15px 0}
+  td{padding:8px;border:1px solid #ccc;font-size:13px}
+  td:first-child{width:160px;background:#f5f5f5;font-weight:bold}
+  .footer{text-align:center;margin-top:30px;font-size:11px;color:#666;border-top:1px dashed #aaa;padding-top:10px}
+  @media print{.no-print{display:none}}
+  </style></head><body>
+  <div class="header">
+    <h2>APAMA BIKE RENTAL - rental2026</h2>
+    <div>Jl. Raya Kuta - Bali | <span class="badge">DATA TERHAPUS - PREVIEW</span></div>
+    <div style="font-size:12px;margin-top:5px">Dicetak: ${new Date().toLocaleString('id-ID')}</div>
+  </div>
+  <h3 style="margin:0 0 10px 0">Detail Data Terhapus: ${d.invoice||d.plat||''}</h3>
+  <table>
+    <tr><td>Waktu Hapus</td><td>${d.waktu||''}</td></tr>
+    <tr><td>Admin Hapus</td><td>${d.admin||''}</td></tr>
+    <tr><td>Jenis</td><td>${d.jenis||'invoice'}</td></tr>
+    <tr><td>Invoice</td><td><b>${d.invoice||'-'}</b></td></tr>
+    <tr><td>Customer</td><td>${d.customer||'-'}</td></tr>
+    <tr><td>Mobil</td><td>${d.mobil||'-'}</td></tr>
+    <tr><td>No Polisi / Plat</td><td>${d.plat||'-'}</td></tr>
+    <tr><td>Total</td><td><b>Rp ${parseInt(d.total||0).toLocaleString('id-ID')}</b></td></tr>
+    <tr><td>Status</td><td style="color:#dc3545;font-weight:bold">SUDAH DIHAPUS DARI SISTEM</td></tr>
+  </table>
+  ${d.data_asli?`<h4>Data Asli Lengkap:</h4><pre style="background:#f8f9fa;border:1px solid #ddd;padding:10px;font-size:11px;white-space:pre-wrap;max-height:300px;overflow:auto">${JSON.stringify(d.data_asli,null,2)}</pre>`:''}
+  <div class="footer">
+    Dokumen ini adalah bukti preview data yang sudah dihapus dari sistem rental2026<br>
+    File: hapus.html | KEY: 28Maret2024*# | rental2026 FIREBASE SINGAPORE
+  </div>
+  <div class="no-print" style="text-align:center;margin-top:20px">
+    <button onclick="window.print()" style="padding:10px 20px;background:#1a2a4a;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer">🖨️ CETAK / SAVE PDF</button>
+    <button onclick="window.close()" style="padding:10px 20px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer;margin-left:8px">Tutup</button>
+  </div>
+  </body></html>
+  `);
+  w.document.close();
+  w.focus();
+}
+
+window.cetakSemua=function(){
+  if(allLogs.length==0) return alert('Belum ada data beb!');
+  let w=window.open('','_blank','width=900,height=700');
+  let rows='';
+  allLogs.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0)).forEach((d,i)=>{
+    rows+=`<tr><td>${i+1}</td><td>${d.waktu||''}</td><td>${d.invoice||d.plat||''}</td><td>${d.customer||''}</td><td>${d.mobil||''}</td><td>Rp ${parseInt(d.total||0).toLocaleString('id-ID')}</td><td>${d.admin||''}</td></tr>`;
+  });
+  w.document.write(`
+  <html><head><title>CETAK SEMUA RIWAYAT HAPUS</title>
+  <style>body{font-family:Arial;padding:15px;font-size:12px} table{width:100%;border-collapse:collapse} th,td{border:1px solid #ccc;padding:6px;text-align:left} th{background:#1a2a4a;color:#fff} h2{text-align:center} @media print{.no-print{display:none}}</style>
+  </head><body>
+  <h2>APAMA BIKE RENTAL - LAPORAN RIWAYAT HAPUS<br><span style="font-size:12px;font-weight:normal">rental2026 - ${new Date().toLocaleString('id-ID')} - Total ${allLogs.length} data</span></h2>
+  <table><tr><th>No</th><th>Waktu Hapus</th><th>Invoice/Plat</th><th>Customer</th><th>Mobil</th><th>Total</th><th>Admin</th></tr>${rows}</table>
+  <div class="no-print" style="text-align:center;margin-top:15px"><button onclick="window.print()" style="padding:10px 20px;background:#1a2a4a;color:#fff;border:none;border-radius:6px;font-weight:bold">🖨️ CETAK</button> <button onclick="window.close()" style="padding:10px 20px;background:#6c757d;color:#fff;border:none;border-radius:6px">Tutup</button></div>
+  </body></html>
+  `);
+  w.document.close();
+}
+
+window.clearAll=async function(){
+  if(!confirm('Yakin hapus SEMUA riwayat beb?')) return;
+  let snap=await getDocs(collection(db,"log_hapus")); for(let d of snap.docs){await deleteDoc(doc(db,"log_hapus",d.id));}
+  let snap2=await getDocs(collection(db,"logHapus")); for(let d of snap2.docs){await deleteDoc(doc(db,"logHapus",d.id));}
+  alert('✅ Sudah bersih beb');
+}
+</script>
+</body>
+</html>
