@@ -6,7 +6,7 @@
 *{box-sizing:border-box}
 body{font-family:'Segoe UI',Arial;background:#0a1629;margin:0;padding:10px;color:#333}
 h2{text-align:center;color:#d4af37;margin:5px 0 10px 0;font-size:18px}
-.wrap{display:grid;grid-template-columns:480px 1fr;gap:12px;align-items:start}
+.wrap{display:grid;grid-template-columns:500px 1fr;gap:12px;align-items:start}
 .box-kiri{background:#d6f5d6;border:2px solid #d4af37;border-radius:10px;padding:15px}
 .box-kanan{background:#fff;border:2px solid #d4af37;border-radius:10px;padding:10px;overflow:hidden}
 .form-grid{display:grid;grid-template-columns:105px 1fr;gap:8px;align-items:center;font-size:12px}
@@ -14,15 +14,16 @@ h2{text-align:center;color:#d4af37;margin:5px 0 10px 0;font-size:18px}
 .form-grid input,.form-grid select{padding:6px;border:1px solid #aaa;border-radius:4px;width:100%}
 .form-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .form-2col .form-grid{grid-template-columns:95px 1fr}
+.form-full{grid-template-columns:105px 1fr; margin-bottom:8px}
+.form-full input{width:100% !important; font-weight:600}
 .btn-simpan{background:#007bff;color:#fff;border:none;padding:9px 30px;border-radius:5px;font-weight:bold;cursor:pointer;font-size:13px;margin-top:12px}
 .btn-batal{background:#6c757d;color:#fff;border:none;padding:9px 20px;border-radius:5px;font-weight:bold;cursor:pointer;display:none;margin-top:12px;margin-left:5px}
 p.sub{text-align:center;font-size:12px;font-weight:bold;color:green;margin:10px 0 0 0}
 .lokasi-wrap{display:flex;gap:6px;align-items:center}
-.lokasi-wrap select{flex:none; min-width:260px !important; width:260px !important; padding:7px 10px !important; font-weight:600}
+.lokasi-wrap select{flex:none; min-width:260px !important; width:260px !important; padding:7px 10px !important; font-weight:600; font-size:12px}
 .btn-plusminus{width:32px;height:30px;border:1px solid #aaa;border-radius:4px;font-weight:bold;cursor:pointer;background:#fff;font-size:16px}
 .btn-plusminus:hover{background:#d4af37}
 .stack-lokasi-status{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-/* FIX TABEL BEB BIAR GAK HILANG */
 .table-wrap{overflow-x:auto; border:1px solid #ccc; border-radius:5px}
 table{width:100%;border-collapse:collapse;font-size:11px;min-width:1050px}
 th{background:#d4af37;padding:8px 4px;border:1px solid #aaa;white-space:nowrap;font-size:11px;position:sticky;top:0;z-index:2}
@@ -35,7 +36,7 @@ th.aksi-col{background:#d4af37;z-index:6}
 .btn-detail{background:#17a2b8;color:#fff}
 .btn-edit{background:#ffc107;color:#000}
 .btn-hapus{background:#dc3545;color:#fff}
-@media(max-width:1000px){.wrap{grid-template-columns:1fr}}
+@media(max-width:1000px){.wrap{grid-template-columns:1fr} .lokasi-wrap select{min-width:200px !important; width:200px !important}}
 </style>
 </head>
 <body>
@@ -43,11 +44,13 @@ th.aksi-col{background:#d4af37;z-index:6}
 <div class="wrap">
 <div class="box-kiri">
 <form id="formMobil">
+<!-- NAMA & ALAMAT FULL SAMPAI BATAS KANAN BEB -->
+<div class="form-grid form-full"><label>Nama Pemilik :</label><input id="nama_pemilik" required placeholder="Nama lengkap pemilik"></div>
+<div class="form-grid form-full"><label>Alamat Pemilik :</label><input id="alamat_pemilik" placeholder="Alamat lengkap pemilik"></div>
+
 <div class="form-2col">
 <div>
 <div class="form-grid"><label>No. Polisi :</label><input id="plat" required></div>
-<div class="form-grid"><label>Nama Pemilik :</label><input id="nama_pemilik" required></div>
-<div class="form-grid"><label>Alamat Pemilik :</label><input id="alamat_pemilik"></div>
 <div class="form-grid"><label>Status :</label><select id="status_milik"><option>Milik Sendiri</option><option>Sewa</option><option>Titipan</option></select></div>
 <div class="form-grid"><label>Warna :</label><input id="warna"></div>
 <div class="form-grid"><label>Bahan Bakar :</label><input id="bahan_bakar"></div>
@@ -68,6 +71,7 @@ th.aksi-col{background:#d4af37;z-index:6}
 <div class="form-grid"><label></label><input type="file" id="fotoFile" accept="image/*"></div>
 </div>
 </div>
+
 <div class="stack-lokasi-status">
   <div class="form-grid" style="grid-template-columns:95px 1fr">
     <label>Lokasi :</label>
@@ -82,10 +86,12 @@ th.aksi-col{background:#d4af37;z-index:6}
     <select id="status_mobil"><option>Ada</option><option>Keluar</option><option>Service</option><option>Rusak</option></select>
   </div>
 </div>
+
 <div><button type="submit" class="btn-simpan" id="btnSimpan">Simpan</button><button type="button" id="btnBatal" class="btn-batal" onclick="batalEdit()">Batal</button></div>
 </form>
 <p class="sub" id="statusFirebase">✅ FIREBASE rental2026 TERHUBUNG - Total: 0 unit</p>
 </div>
+
 <div class="box-kanan">
 <div style="display:flex;gap:8px;margin-bottom:8px"><input id="cari" placeholder="🔍 Cari Plat / Nama / Merk / Lokasi..." style="flex:1;padding:7px;border:1px solid #aaa;border-radius:5px" oninput="render()"><button onclick="window.location='index.html'" style="background:#d4af37;border:none;padding:7px 12px;border-radius:5px;font-weight:bold;cursor:pointer">🏠 Dashboard</button></div>
 <div class="table-wrap">
@@ -94,9 +100,10 @@ th.aksi-col{background:#d4af37;z-index:6}
 <tbody id="tbodyMobil"><tr><td colspan="10">⏳ Loading 38 unit...</td></tr></tbody>
 </table>
 </div>
-<div style="text-align:center;font-size:11px;margin-top:6px;color:#666">👉 Geser tabel ke kiri/kanan beb kalau di HP, kolom Aksi udah dikunci di kanan!</div>
+<div style="text-align:center;font-size:11px;margin-top:6px;color:#666">👉 Geser tabel ke kiri/kanan beb kalau di HP</div>
 </div>
 </div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -123,11 +130,16 @@ async function kirimWAOwnerSilent(pesan){
 }
 let listLokasi = JSON.parse(localStorage.getItem('master_lokasi_rental2026')||'null') || ["Garasi Pusat","Garasi Sawan","Garasi Singaraja","Pool Denpasar","Cabang Gilimanuk","Jimbaran","Ubud"];
 function simpanLokasiStorage(){ localStorage.setItem('master_lokasi_rental2026', JSON.stringify(listLokasi)); }
-function renderLokasiDropdown(selectedValue=""){
+function renderLokasiDropdown(selectedValue){
   let sel = document.getElementById('lokasi');
-  let val = selectedValue || sel.value || "";
+  let val = "";
+  if(selectedValue !== undefined && selectedValue !== null){
+    val = selectedValue;
+  } else {
+    val = sel.value || "";
+  }
   sel.innerHTML = '<option value="">- Pilih Lokasi -</option>' + listLokasi.map(l=>`<option value="${l}">${l}</option>`).join('');
-  if(val && listLokasi.includes(val)) sel.value = val;
+  sel.value = val;
 }
 window.tambahLokasi = function(){
   let nama = prompt('Masukkan nama Lokasi baru beb:'); if(!nama) return; nama=nama.trim(); if(!nama) return;
@@ -142,10 +154,10 @@ window.hapusLokasi = function(){
   if(!confirm('Yakin hapus lokasi "'+cur+'" beb?')) return;
   listLokasi=listLokasi.filter(l=>l!==cur); simpanLokasiStorage(); renderLokasiDropdown(""); alert('✅ Dihapus beb!');
 }
-renderLokasiDropdown();
+renderLokasiDropdown("");
 try{ onSnapshot(collection(db, "master_lokasi"), s=>{
   let fromFB = s.docs.map(d=>d.data().nama).filter(Boolean);
-  if(fromFB.length>0){ let gabung=[...new Set([...listLokasi, ...fromFB])]; if(gabung.length!=listLokasi.length){ listLokasi=gabung; simpanLokasiStorage(); renderLokasiDropdown(document.getElementById('lokasi').value); } }
+  if(fromFB.length>0){ let gabung=[...new Set([...listLokasi, ...fromFB])]; if(gabung.length!=listLokasi.length){ listLokasi=gabung; simpanLokasiStorage(); let cur=document.getElementById('lokasi').value; if(cur) renderLokasiDropdown(cur); } }
 }); }catch(e){}
 let dataMobil = []; let idEdit = null; let fotoBase64 = '';
 document.getElementById('fotoFile').addEventListener('change', function(e){
@@ -163,7 +175,7 @@ window.render = function(){
   let cari=(document.getElementById('cari').value||'').toLowerCase();
   let list=dataMobil.filter(m => (m.plat||'').toLowerCase().includes(cari) || (m.nama_pemilik||'').toLowerCase().includes(cari) || (m.merk||'').toLowerCase().includes(cari) || (m.lokasi||'').toLowerCase().includes(cari));
   let tbody=document.getElementById('tbodyMobil');
-  if(list.length==0){ tbody.innerHTML='<tr><td colspan="10">Belum ada armada beb, atau filter tidak ketemu</td></tr>'; return; }
+  if(list.length==0){ tbody.innerHTML='<tr><td colspan="10">Belum ada armada beb</td></tr>'; return; }
   tbody.innerHTML='';
   list.forEach(m=>{
     let status=m.status_mobil||m.status||'Ada';
@@ -195,7 +207,7 @@ window.render = function(){
 };
 window.detailMobil = function(id){
   let m=dataMobil.find(x=>x.id==id); if(!m) return;
-  alert('DETAIL ARMADA\n\nPlat: '+(m.plat||'')+'\nNama: '+(m.nama_pemilik||'')+'\nMerk: '+(m.merk||'')+'\nType: '+(m.type||'')+'\nLokasi: '+(m.lokasi||'-')+'\nStatus: '+(m.status_mobil||''));
+  alert('DETAIL ARMADA\n\nPlat: '+(m.plat||'')+'\nNama: '+(m.nama_pemilik||'')+'\nAlamat: '+(m.alamat_pemilik||'')+'\nMerk: '+(m.merk||'')+'\nLokasi: '+(m.lokasi||'-')+'\nStatus: '+(m.status_mobil||''));
 };
 window.editMobil = function(id){
   let m=dataMobil.find(x=>x.id==id); if(!m) return;
@@ -219,7 +231,7 @@ window.editMobil = function(id){
   document.getElementById('berlaku_sd').value=m.berlaku_sd||'';
   document.getElementById('foto').value=m.foto||m.foto_mobil||'';
   if(m.lokasi && !listLokasi.includes(m.lokasi)){ listLokasi.push(m.lokasi); simpanLokasiStorage(); }
-  renderLokasiDropdown(m.lokasi||'');
+  if(m.lokasi){ renderLokasiDropdown(m.lokasi); } else { renderLokasiDropdown(""); }
   document.getElementById('status_mobil').value=m.status_mobil||'Ada';
   document.getElementById('btnSimpan').innerText='Update';
   document.getElementById('btnBatal').style.display='inline-block';
