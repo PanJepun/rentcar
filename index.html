@@ -2,94 +2,125 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Rental - Panjepun</title>
+<title>APAMA RENTAL - Login</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
-  body { font-family: sans-serif; background:#f5f5f5; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
-  .card { background:#fff; padding:30px 25px; border-radius:16px; box-shadow:0 5px 20px rgba(0,0,0,0.1); width:90%; max-width:360px; text-align:center; }
-  button { width:100%; padding:14px; border-radius:10px; border:none; font-size:16px; cursor:pointer; margin-top:10px; }
-  .btn-daftar { background:#eee; }
-  .btn-login { background:#000; color:#fff; }
-  #status { margin-top:15px; font-size:13px; color:#d00; min-height:20px; }
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',Arial;background:#0a1629;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.login-box{background:#12233a;width:100%;max-width:400px;border-radius:16px;padding:30px 25px;box-shadow:0 10px 30px rgba(0,0,0,0.5);border:1px solid #1e3a5f}
+.logo{text-align:center;color:#ff7a00;font-size:26px;font-weight:900;margin:0}
+.sub{text-align:center;color:#94a3b8;font-size:12px;margin:5px 0 20px 0}
+label{color:#cbd5e1;font-size:11px;font-weight:700;display:block;margin:15px 0 6px 0}
+select,input{width:100%;padding:13px;background:#1e293b;border:1px solid #334155;border-radius:10px;color:white;font-size:14px;outline:none}
+select:focus,input:focus{border-color:#ff7a00}
+.btn-orange{background:#ff7a00;color:white;border:none;padding:14px;width:100%;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;margin-top:18px}
+.btn-orange:disabled{background:#475569;cursor:not-allowed}
+.btn-ungu{background:#8b5cf6;color:white;border:none;padding:14px;width:100%;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;margin-top:12px}
+.divider{display:flex;align-items:center;gap:10px;color:#64748b;font-size:11px;margin:20px 0 0 0}
+.divider:before,.divider:after{content:"";flex:1;height:1px;background:#334155}
+#status{font-size:11px;text-align:center;margin-top:10px;font-weight:700}
 </style>
 </head>
 <body>
-<div class="card">
-  <h2>🚗 Rentcar Panjepun</h2>
-  <p>Halo beb, login pake wajah dulu ya</p>
-  <button class="btn-daftar" id="btnDaftar">1. Daftar Wajah Dulu</button>
-  <button class="btn-login" id="btnLogin">2. Login dengan Wajah 😊</button>
-  <p id="status"></p>
-  <p style="font-size:12px; color:#999;">Buka di Chrome / Safari, jangan dari WhatsApp ya beb</p>
-</div>
-<script>
-const statusEl = document.getElementById('status');
-function pesan(t){ statusEl.innerText = t; }
+<div class="login-box">
+  <p class="logo">🚗 APAMA RENTAL</p>
+  <p class="sub">Sistem Rental Mobil Premium</p>
+  <p id="status" style="color:#fbbf24;">⏳ Memuat daftar user dari Firestore...</p>
 
-function buatChallenge(){
-  const arr = new Uint8Array(32);
-  crypto.getRandomValues(arr);
-  return arr;
+  <label>PILIH USER</label>
+  <select id="pilihUser">
+    <option value="">-- Pilih Nama Anda --</option>
+  </select>
+
+  <label style="margin-top:12px;">PASSWORD</label>
+  <input type="password" id="passwordUser" placeholder="Masukkan Password">
+
+  <button class="btn-orange" id="btnLogin" onclick="loginUser()">➡️ LOGIN</button>
+
+  <div class="divider">ATAU MASTER KEY</div>
+
+  <label>MASTER KEY</label>
+  <input type="password" id="masterKey" placeholder="Masukkan Master Key">
+
+  <label>PASSWORD</label>
+  <input type="password" id="passwordMaster" placeholder="Masukkan Password">
+
+  <button class="btn-ungu" onclick="loginMaster()">👑 LOGIN MASTER KEY</button>
+  <p style="text-align:center;color:#64748b;font-size:11px;margin-top:15px;">User dibuat di Tools -> <a href="tools.html" style="color:#ff7a00;">Buka Tools</a></p>
+</div>
+
+<script>
+// SAMA KAYAK TOOLS BEB - PAKAI FIRESTORE, BUKAN REALTIME LAGI
+const firebaseConfig = {
+  apiKey: "AIzaSyAYDuYpHiGqKLaGE__-fp-h00pUIAZGv7Vs",
+  authDomain: "rental2026.firebaseapp.com",
+  projectId: "rental2026",
+  storageBucket: "rental2026.firebasestorage.app",
+  messagingSenderId: "460493800655",
+  appId: "1:460493800655:web:cac5f561fc29e764a23ba"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let daftarUser = {}; // simpan password per user
+
+// INI YANG BENERIN DROPDOWN BEB
+db.collection("users").onSnapshot((snap)=>{
+  let select = document.getElementById('pilihUser');
+  select.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
+  daftarUser = {};
+  if(snap.empty){
+    document.getElementById('status').innerText = "⚠️ Belum ada user di Firestore! Buat dulu di Tools beb.";
+    document.getElementById('status').style.color = "#ef4444";
+    return;
+  }
+  snap.forEach(doc=>{
+    let u = doc.data();
+    // u.username = angel, u.nama = Angel
+    let tampil = u.nama || u.username;
+    let nilai = u.username;
+    daftarUser[nilai] = u;
+    let opt = document.createElement('option');
+    opt.value = nilai;
+    opt.textContent = tampil + " (" + (u.role || '') + ")";
+    select.appendChild(opt);
+  });
+  document.getElementById('status').innerText = "✅ Ketemu " + snap.size + " user - Silahkan pilih nama Anda";
+  document.getElementById('status').style.color = "#22c55e";
+}, (err)=>{
+  document.getElementById('status').innerText = "❌ Gagal load user: " + err.message;
+  document.getElementById('status').style.color = "#ef4444";
+});
+
+function loginUser(){
+  let username = document.getElementById('pilihUser').value;
+  let pass = document.getElementById('passwordUser').value;
+  if(!username){ alert("Pilih dulu nama Anda beb!"); return; }
+  if(!pass){ alert("Masukkan password beb!"); return; }
+  let u = daftarUser[username];
+  if(!u){ alert("User tidak ditemukan beb!"); return; }
+  if(String(u.password) === String(pass)){
+    localStorage.setItem("apama_user", JSON.stringify(u));
+    alert("✅ Selamat datang " + (u.nama || username) + " (" + u.role + ")");
+    window.location = "dashboard.html";
+  } else {
+    alert("❌ Password salah beb! Coba lagi.");
+  }
 }
 
-document.getElementById('btnDaftar').onclick = async () => {
-  if(!window.isSecureContext){
-    pesan('Harus dibuka lewat https beb, jangan dari file / WhatsApp.');
-    return;
+function loginMaster(){
+  let key = document.getElementById('masterKey').value;
+  let pass = document.getElementById('passwordMaster').value;
+  // Ganti sesuai master key Bapak ya beb
+  if(key === "APAMA123" && pass === "apama123"){
+    localStorage.setItem("apama_user", JSON.stringify({username:"master", nama:"Master", role:"Admin/Owner"}));
+    alert("✅ Login Master berhasil beb!");
+    window.location = "dashboard.html";
+  } else {
+    alert("❌ Master Key / Password salah beb!");
   }
-  if(!window.PublicKeyCredential){
-    pesan('HP ini belum support login wajah beb, coba di HP lain / Chrome terbaru.');
-    return;
-  }
-  try {
-    pesan('Tunggu... lagi minta izin Face ID, langsung scan ya beb...');
-    const challenge = buatChallenge();
-    const credential = await navigator.credentials.create({
-      publicKey: {
-        challenge: challenge,
-        rp: { name: "Rentcar Panjepun", id: location.hostname },
-        user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "admin@rentcar", displayName: "Admin Rental" },
-        pubKeyCredParams: [{alg: -7, type: "public-key"}, {alg: -257, type: "public-key"}],
-        authenticatorSelection: { userVerification: "required" },
-        timeout: 120000,
-        attestation: "none"
-      }
-    });
-    const rawId = new Uint8Array(credential.rawId);
-    let str = '';
-    rawId.forEach(b => str += String.fromCharCode(b));
-    localStorage.setItem('wajah_id', btoa(str));
-    pesan('Berhasil daftar! Sekarang pencet no 2 beb.');
-  } catch(e) {
-    if(e.name === 'NotAllowedError'){
-      pesan('Dibatalkan / timeout beb. Coba lagi, buka di Chrome langsung, pas muncul Face ID langsung scan, jangan kelamaan.');
-    } else {
-      pesan('Gagal: ' + e.message);
-    }
-  }
-};
-
-document.getElementById('btnLogin').onclick = async () => {
-  try {
-    const idSimpan = localStorage.getItem('wajah_id');
-    if(!idSimpan){ pesan('Belum daftar beb, pencet no 1 dulu!'); return; }
-    pesan('Silahkan scan wajah...');
-    const allow = Uint8Array.from(atob(idSimpan), c => c.charCodeAt(0));
-    await navigator.credentials.get({
-      publicKey: {
-        challenge: buatChallenge(),
-        allowCredentials: [{ id: allow, type: "public-key" }],
-        userVerification: "required",
-        timeout: 120000,
-      }
-    });
-    pesan('Wajah cocok! Masuk...');
-    sessionStorage.setItem('sudah_login', 'ya');
-    setTimeout(()=>{ window.location.href = 'dashboard.html'; }, 800);
-  } catch(e) {
-    pesan('Wajah tidak cocok / dibatalkan beb. Coba lagi.');
-  }
-};
+}
 </script>
 </body>
 </html>

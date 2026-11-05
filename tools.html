@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>APAMA RENTAL - Tools - Firestore</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+body{font-family:'Poppins';margin:0;background:#e6ecf3;}
+nav{background:#1e293b;color:#fff;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;}
+nav ul{display:flex;gap:5px;list-style:none;margin:0;padding:0;flex-wrap:wrap;}
+nav ul li a{color:#cbd5e1;text-decoration:none;padding:8px 12px;font-size:13px;border-radius:6px;display:block;}
+nav ul li a.active{background:#10b981;color:#fff;}
+.container{padding:20px 30px;}
+.card{background:#fff;border-radius:12px;padding:20px;}
+.card h2{font-size:16px;margin:0 0 15px 0;font-weight:700;border-bottom:1px solid #eee;padding-bottom:10px;}
+.form-group{margin-bottom:12px;}
+.form-group label{font-size:12px;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;}
+input,select,button{padding:10px;border:1px solid #cbd5e1;border-radius:6px;width:100%;box-sizing:border-box;font-family:'Poppins';}
+.btn-hijau{background:#10b981;color:#fff;border:none;font-weight:700;cursor:pointer;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th{background:#1e293b;color:#fff;padding:10px;text-align:left;font-size:13px;}
+td{border-bottom:1px solid #e2e8f0;padding:10px;font-size:13px;}
+.role-badge{background:#e2e8f0;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+.td-aksi{display:flex;gap:8px;}
+.btn-aksi-kecil{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;width:auto;}
+.btn-edit-kecil{background:#f59e0b;color:#fff;}.btn-delete-kecil{background:#ef4444;color:#fff;}
+</style>
+</head>
+<body>
+<nav>
+  <div>🚗 APAMA RENTAL</div>
+  <ul>
+    
+    <li><a href="https://panjepun.github.io/rentcar/mobil.html">🚗 Data Armada</a></li>
+    <li><a href="https://panjepun.github.io/rentcar/transaksi.html">Transaksi</a></li>
+    <li><a href="https://panjepun.github.io/rentcar/tools.html" class="active">⚙️ Tools</a></li>
+  </ul>
+</nav>
+<div class="container">
+  <p id="statusKonek" style="text-align:center;font-size:12px;font-weight:700;color:#b45309;">⏳ Menghubungkan ke Firestore rental2026...</p>
+  <p id="debugInfo" style="text-align:center;font-size:11px;color:#64748b;"></p>
+  <div class="card">
+    <h2>👤 Tambah / Kelola Akun Pengguna</h2>
+    <form id="formUser">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+        <div class="form-group"><label>USERNAME</label><input type="text" id="username" required></div>
+        <div class="form-group"><label>NAMA LENGKAP</label><input type="text" id="namaLengkap" required></div>
+        <div class="form-group"><label>PASSWORD</label><input type="password" id="password" required></div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 200px; gap:10px; align-items:end;">
+        <div class="form-group">
+          <label>ROLE JABATAN</label>
+          <select id="roleUser">
+            <option value="Admin/Owner">👑 Admin / Owner</option>
+            <option value="Kasir">💼 Kasir</option>
+            <option value="Staff">🙋 Staff</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-hijau">📁 Simpan Akun User</button>
+      </div>
+    </form>
+  </div>
+  <div class="card" style="margin-top:20px;">
+    <h2>Daftar Pengguna Aktif <span id="jumlahUser" style="font-size:12px;color:#10b981;"></span></h2>
+    <table id="tableUser"><thead><tr><th>Username</th><th>Nama Lengkap</th><th>Role</th><th width="180">Aksi</th></tr></thead><tbody><tr><td colspan="4" style="text-align:center;color:#94a3b8;">⏳ Memuat data...</td></tr></tbody></table>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAYDuYpHiGqKLaGE__-fp-h00pUIAZGv7Vs",
+  authDomain: "rental2026.firebaseapp.com",
+  projectId: "rental2026",
+  storageBucket: "rental2026.firebasestorage.app",
+  messagingSenderId: "460493800655",
+  appId: "1:460493800655:web:cac5f561fc29e764a23ba"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+let editUserId = null;
+
+function setStatus(msg, color){
+  document.getElementById('statusKonek').innerText = msg;
+  document.getElementById('statusKonek').style.color = color;
+}
+
+// INI YANG BENER BEB - PAKAI FIRESTORE, SAMA KAYAK DASHBOARD
+db.collection("users").onSnapshot((snapshot) => {
+  setStatus("✅ Tersambung ke Firestore rental2026 - Ketemu " + snapshot.size + " user", "green");
+  document.getElementById('jumlahUser').innerText = "(" + snapshot.size + " user)";
+  let html = "";
+  if(snapshot.empty){
+    html = `<tr><td colspan="4" style="text-align:center;color:#ef4444;">Belum ada user di Firestore / collection 'users' kosong beb. Coba simpan 1 user baru di atas.</td></tr>`;
+  } else {
+    snapshot.forEach((doc) => {
+      let u = doc.data();
+      html += `
+        <tr>
+          <td><b>${u.username || '-'}</b></td>
+          <td>${u.nama || '-'}</td>
+          <td><span class="role-badge">${u.role || '-'}</span></td>
+          <td class="td-aksi">
+            <button class="btn-aksi-kecil btn-edit-kecil" onclick="editUser('${doc.id}')">✏️ Edit</button>
+            <button class="btn-aksi-kecil btn-delete-kecil" onclick="hapusUser('${doc.id}')" ${u.role=="Admin/Owner"?"disabled":""}>🗑️ Hapus</button>
+          </td>
+        </tr>`;
+    });
+  }
+  document.querySelector("#tableUser tbody").innerHTML = html;
+}, (error) => {
+  setStatus("❌ GAGAL: " + error.message, "red");
+  document.getElementById('debugInfo').innerText = "Error code: " + error.code + " - Cek di Firebase: Build -> Firestore Database -> Rules harus allow read, write: if true";
+  console.error("Firestore error:", error);
+});
+
+document.getElementById('formUser').addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  let data = {
+    username: document.getElementById('username').value,
+    nama: document.getElementById('namaLengkap').value,
+    password: document.getElementById('password').value,
+    role: document.getElementById('roleUser').value
+  };
+  try{
+    if(editUserId == null){
+      await db.collection("users").add(data);
+    } else {
+      await db.collection("users").doc(editUserId).set(data);
+      editUserId = null;
+    }
+    e.target.reset();
+    alert("✅ User tersimpan ke Firestore rental2026!");
+  }catch(err){
+    alert("❌ Gagal simpan: " + err.message);
+  }
+});
+
+async function editUser(id){
+  let doc = await db.collection("users").doc(id).get();
+  let u = doc.data();
+  document.getElementById('username').value = u.username;
+  document.getElementById('namaLengkap').value = u.nama;
+  document.getElementById('password').value = u.password;
+  document.getElementById('roleUser').value = u.role;
+  editUserId = id;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+async function hapusUser(id){
+  if(confirm("Hapus user ini?")) await db.collection("users").doc(id).delete();
+}
+</script>
+</body>
+</html>

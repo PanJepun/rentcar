@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>DASHBOARD RENTAL MOTOR - rental2026 FIREBASE - V6 FIX FONNTE</title>
+<title>DASHBOARD RENTAL - rental2026 - V11 WARNING 1 LAYAR</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#12233a 100%);margin:0;padding:0;color:#333}
 .header{background:linear-gradient(90deg,#d4af37 0%,#f7eb81 100%);padding:12px 20px;color:#000;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.3);gap:15px}
@@ -56,22 +58,46 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 .katalog-info .harga{font-size:15px;color:#e53935;font-weight:700}
 .status-ada{background:#e8f5e9;color:#2e7d32;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold}
 .status-keluar{background:#f8d7da;color:#721c24;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:bold}
+.backup-box{background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;padding:15px;margin-top:18px}
+.btn-backup{padding:10px 16px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+.btn-hijau{background:#22c55e;color:white}
+.btn-biru{background:#3b82f6;color:white}
+.btn-ungu{background:#8b5cf6;color:white}
+.backup-table{width:100%;border-collapse:collapse;margin-top:10px;background:white}
+.backup-table th{background:#1a2a4a;color:white;padding:8px;text-align:left;font-size:12px}
+.backup-table td{border-bottom:1px solid #ddd;padding:8px;font-size:12px}
+#backupDetail{background:#0a1629;color:#d4af37;padding:12px;border-radius:8px;font-size:11px;white-space:pre-wrap;max-height:300px;overflow:auto;display:none;margin-top:10px}
+/* WARNING 1 LAYAR - FIX BEB, TOMBOL SELALU KELIHATAN */
+.modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:999;padding:10px;box-sizing:border-box}
+.modal-box{background:white;border-radius:12px;max-width:440px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.5)}
+.modal-head{background:#dc2626;color:white;padding:10px 12px;text-align:center;flex-shrink:0}
+.modal-head h2{margin:0;font-size:16px;line-height:1.2}
+.modal-head p{margin:3px 0 0 0;font-size:11px}
+.modal-body{padding:10px 14px;font-size:12px;line-height:1.4;color:#334155;overflow-y:auto;flex:1}
+.modal-body .warn-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px;margin:8px 0;font-size:11px;line-height:1.4}
+.modal-body input[type=text]{width:100%;padding:9px;border:2px solid #e5e7eb;border-radius:8px;margin-top:5px;font-size:13px;font-weight:700;text-transform:uppercase;box-sizing:border-box}
+.modal-foot{display:flex;gap:8px;padding:10px 14px 12px 14px;background:#fff;border-top:1px solid #eee;flex-shrink:0}
+.btn-batal{flex:1;padding:12px;border:1px solid #ddd;background:#e5e7eb;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px}
+.btn-restore-warn{flex:1.2;padding:12px;border:none;background:#dc2626;color:white;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px}
+.btn-restore-warn:disabled{background:#9ca3af;cursor:not-allowed}
 @media(max-width:1000px){.card-grid,.menu-grid,.info-armada,.katalog-grid{grid-template-columns:repeat(2,1fr)}.slide{flex-direction:column}.slide-img,.slide-info{width:100%}}
 </style>
 </head>
 <body>
 <div class="header">
-<div class="header-kiri"><h1>🚗 DASHBOARD RENTAL - rental2026</h1><div class="marquee"><span>APAMA BIKE RENTAL BALI - V6 FIX FONNTE LINK - FIREBASE ACTIVE - GROUP RENTAL APAMA HZ8HAZkVT2sChPO7j5jjq2 - SLIDE LANCAR BEB!</span></div></div>
+<div class="header-kiri"><h1>🚗 DASHBOARD RENTAL - rental2026</h1><div class="marquee"><span>APAMA BIKE RENTAL BALI - V11 WARNING 1 LAYAR - FIREBASE ACTIVE - GROUP RENTAL APAMA HZ8HAZkVT2sChPO7j5jjq2 - SLIDE LANCAR BEB!</span></div></div>
 <span class="header-kanan" id="tgl_sekarang"></span>
 </div>
 <div class="navbar">
-<a href="https://panjepun.github.io/rentcar/index.html" class="active">Dashboard</a>
-<a href="https://panjepun.github.io/rentcar/mobil.html">Data Armada</a>
-<a href="https://panjepun.github.io/rentcar/transaksi.html">Transaksi</a>
-<a href="https://panjepun.github.io/rentcar/customer.html">Customer Kredit</a>
-<a href="https://panjepun.github.io/rentcar/custreg.html">Customer Reguler</a>
-<a href="https://panjepun.github.io/rentcar/laporan.html">Laporan</a>
-<a href="https://panjepun.github.io/rentcar/hapus.html" style="background:#dc3545;">🗑️ Riwayat Hapus</a>
+<a href="dashboard.html" class="active">Dashboard</a>
+<a href="mobil.html">Data Armada</a>
+<a href="transaksi.html">Transaksi</a>
+<a href="customer.html">Customer Kredit</a>
+<a href="custreg.html">Customer Reguler</a>
+<a href="laporan.html">Laporan</a>
+<a href="tools.html">⚙️ Tools</a>
+<a href="#backupSection" style="background:#22c55e;color:#fff;">💾 Backup</a>
+<a href="hapus.html" style="background:#dc3545;">🗑️ Riwayat Hapus</a>
 </div>
 <div class="container">
 <div class="slider" id="sliderMobil"><div class="slides" id="slidesContainer"></div><button class="prev" onclick="geserSlide(-1)">❮</button><button class="next" onclick="geserSlide(1)">❯</button><div class="dots" id="dotsContainer"></div></div>
@@ -81,35 +107,67 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 <p id="statusFirebase" style="text-align:center;font-size:11px;font-weight:bold;white-space:pre-wrap">⏳ Menghubungkan ke Firebase rental2026 + Fonnte...</p>
 <h3 class="menu-title">MENU UTAMA</h3>
 <div class="menu-grid">
-<div class="menu-item" onclick="window.location='https://panjepun.github.io/rentcar/mobil.html'"><img src="https://cdn-icons-png.flaticon.com/512/1076/1076965.png"><h3>Data Armada</h3></div>
-<div class="menu-item" onclick="window.location='https://panjepun.github.io/rentcar/transaksi.html'"><img src="https://cdn-icons-png.flaticon.com/512/2821/2821001.png"><h3>Transaksi Sewa</h3></div>
-<div class="menu-item" onclick="window.location='https://panjepun.github.io/rentcar/customer.html'"><img src="https://cdn-icons-png.flaticon.com/512/219/219983.png"><h3>Customer Kredit</h3></div>
-<div class="menu-item" onclick="window.location='https://panjepun.github.io/rentcar/laporan.html'"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"><h3>Laporan</h3></div>
-<div class="menu-item" onclick="window.location='https://panjepun.github.io/rentcar/custreg.html'"><img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png"><h3>Customer Reguler</h3></div>
-<div class="menu-item" onclick="window.location='https://panjepun.github.io/rentcar/hapus.html'" style="border-color:#dc3545;background:#fff5f5"><img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png"><h3 style="color:#dc3545">🗑️ Riwayat Hapus</h3></div>
+<div class="menu-item" onclick="window.location='mobil.html'"><img src="https://cdn-icons-png.flaticon.com/512/1076/1076965.png"><h3>Data Armada</h3></div>
+<div class="menu-item" onclick="window.location='transaksi.html'"><img src="https://cdn-icons-png.flaticon.com/512/2821/2821001.png"><h3>Transaksi Sewa</h3></div>
+<div class="menu-item" onclick="window.location='customer.html'"><img src="https://cdn-icons-png.flaticon.com/512/219/219983.png"><h3>Customer Kredit</h3></div>
+<div class="menu-item" onclick="window.location='laporan.html'"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"><h3>Laporan</h3></div>
+<div class="menu-item" onclick="window.location='custreg.html'"><img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png"><h3>Customer Reguler</h3></div>
+<div class="menu-item" onclick="window.location='tools.html'" style="border-color:#d4af37;background:#fff8e1"><img src="https://cdn-icons-png.flaticon.com/512/3524/3524636.png"><h3>⚙️ Tools</h3></div>
+<div class="menu-item" onclick="document.getElementById('backupSection').scrollIntoView({behavior:'smooth'})" style="border-color:#22c55e;background:#f0fdf4"><img src="https://cdn-icons-png.flaticon.com/512/2906/2906274.png"><h3 style="color:#15803d">💾 Backup Data</h3></div>
+<div class="menu-item" onclick="window.location='hapus.html'" style="border-color:#dc3545;background:#fff5f5"><img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png"><h3 style="color:#dc3545">🗑️ Riwayat Hapus</h3></div>
+</div>
+<div class="backup-box" id="backupSection">
+  <h3 style="margin:0 0 5px 0;color:#15803d;">💾 BACKUP / LIHAT DATA BACKUP - ANTI DOUBLE + WARNING 1 LAYAR</h3>
+  <p style="font-size:12px;color:#64748b;margin:0 0 10px 0;">Restore cuma nambah yang hilang aja beb. Data baru tidak tertimpa, tidak double. Contoh: Backup 10, data jadi 12, restore tetap 12.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn-backup btn-hijau" onclick="buatBackup()">📥 Backup Sekarang</button>
+    <button class="btn-backup btn-biru" onclick="loadBackupList()">👀 Lihat Backup</button>
+    <button class="btn-backup btn-ungu" onclick="exportBackupJSON()">⬇️ Download JSON Terakhir</button>
+    <input type="file" id="fileRestore" accept=".json" style="display:none;" onchange="siapkanRestoreFile(event)">
+    <button class="btn-backup" style="background:#f59e0b;color:#fff;" onclick="document.getElementById('fileRestore').click()">📂 Restore dari File JSON</button>
+  </div>
+  <p id="statusBackup" style="font-size:12px;font-weight:700;color:#15803d;margin:10px 0 0 0;"></p>
+  <table class="backup-table" id="tabelBackup" style="display:none;"><thead><tr><th>Tanggal Backup</th><th>Armada</th><th>Transaksi</th><th>User</th><th>Aksi</th></tr></thead><tbody></tbody></table>
+  <div id="backupDetail"></div>
 </div>
 </div>
 <h3 class="katalog-title">KATALOG ARMADA KAMI - rental2026</h3>
 <div class="katalog-grid" id="katalogContainer"></div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<!-- MODAL WARNING 1 LAYAR BEB -->
+<div class="modal-bg" id="modalRestore" onclick="if(event.target===this) tutupModalRestore()">
+  <div class="modal-box">
+    <div class="modal-head"><h2>⚠️ MAU RESTORE DATA?</h2><p>Baca sebentar aja beb, jangan asal klik!</p></div>
+    <div class="modal-body">
+      <div id="isiWarningRestore"></div>
+      <div class="warn-box">
+        <b>✅ Yang terjadi:</b> Cuma nambah yang <b>hilang</b>. Yang udah ada <b>tidak ditimpa</b>. Data baru <b>tetap ada</b>. <b>Tidak double.</b><br>
+        Contoh: Backup 10, sekarang 12, restore tetap <b>12</b>.
+      </div>
+      <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;"><input type="checkbox" id="cekSetuju" onchange="cekTombolRestore()" style="width:18px;height:18px;margin-top:1px;flex-shrink:0;"><span>Saya paham, restore cuma nambah yang hilang.</span></label>
+      <p style="margin:8px 0 0 0;font-weight:700;">Ketik <span style="color:#dc2626;">RESTORE</span> :</p>
+      <input type="text" id="ketikRestore" placeholder="KETIK RESTORE" oninput="cekTombolRestore()" autocomplete="off">
+      <p id="pesanKetik" style="font-size:11px;color:#dc2626;margin:4px 0 0 0;"></p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-batal" onclick="tutupModalRestore()">❌ BATAL</button>
+      <button class="btn-restore-warn" id="btnKonfirmasiRestore" disabled onclick="jalankanRestore()">♻️ YA, RESTORE</button>
+    </div>
+  </div>
+</div>
 
+<script>
 const firebaseConfig = {
-  apiKey: "AIzaSyAYDuYpHiGqKLaG_E__fp-h00pUIAZgV7Vs",
+  apiKey: "AIzaSyAYDuYpHiGqKLaGE__-fp-h00pUIAZGv7Vs",
   authDomain: "rental2026.firebaseapp.com",
   projectId: "rental2026",
   storageBucket: "rental2026.firebasestorage.app",
   messagingSenderId: "460493800655",
-  appId: "1:460493800655:web:cac5f561fc219e764a23ba"
+  appId: "1:460493800655:web:cac5f561fc29e764a23ba"
 };
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ===== LINK FONNTE YANG BENER BEB! =====
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 const URL_FETCH_GROUP = "https://api.fonnte.com/fetch-group";
 const URL_GET_GROUP = "https://api.fonnte.com/get-whatsapp-group";
 const URL_SEND = "https://api.fonnte.com/send";
@@ -117,16 +175,13 @@ const WA_TOKEN = "AHdnAppaZGYiKcaWt1JH";
 const NOMOR_WA_ADMIN = "6282340152478";
 let GROUP_ID_RENTAL_APAMA = localStorage.getItem("rental_apama_group_id") || "";
 let GROUP_NAME = localStorage.getItem("rental_apama_group_name") || "Rental Apama";
-
-let dataMobil = []; let dataTransaksi = []; let slideIndex = 1;
-let sliderSudahRender = false;
-
+let dataMobil = []; let dataTransaksi = []; let dataUser = [];
+let slideIndex = 1; let sliderSudahRender = false;
+let backupTerakhir = null;
+let restoreYangDipilih = null;
 document.getElementById('tgl_sekarang').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
 function norm(m){return {...m,status: m.status_mobil || m.status || 'Ada',foto: m.foto || m.foto_mobil || '',plat: m.plat || m.no_polisi || '-',merk: m.merk || '',type: m.type || '',};}
-
 function getStatus(status){let s=String(status||'ADA').toUpperCase(); if(s=='KELUAR') return '<span class="status-keluar">KELUAR</span>'; return '<span class="status-ada">ADA</span>';}
-
 function renderAll(){
   let totalArmada=dataMobil.length;
   let statusAda=dataMobil.filter(m=>String(m.status||'').toUpperCase()=='ADA').length;
@@ -139,15 +194,11 @@ function renderAll(){
   let bulanIni=new Date().getMonth(); let tahunIni=new Date().getFullYear();
   let mobilDisewaBulan=dataTransaksi.filter(t=>{let d=new Date(t.tgl_sewa||t.created_at); return d.getMonth()==bulanIni && d.getFullYear()==tahunIni;}).length;
   document.getElementById('mobil_disewa_bulan').innerText=mobilDisewaBulan+' Unit';
-  document.getElementById('statusFirebase').innerText = `✅ FIREBASE: ${totalArmada} armada | Slide: ${slideIndex} | Group ID: ${GROUP_ID_RENTAL_APAMA || 'Belum set - Klik booking akan auto set beb! Invite HZ8HAZkVT2sChPO7j5jjq2'}`;
+  document.getElementById('statusFirebase').innerText = `✅ FIREBASE: ${totalArmada} armada | ${dataTransaksi.length} transaksi | ${dataUser.length} user | Slide: ${slideIndex} | Group: ${GROUP_ID_RENTAL_APAMA || 'Belum set'}`;
   document.getElementById('statusFirebase').style.color = 'green';
-  if(!sliderSudahRender || document.querySelectorAll('.slide').length !== totalArmada){
-    renderSlider();
-    sliderSudahRender = true;
-  }
+  if(!sliderSudahRender || document.querySelectorAll('.slide').length !== totalArmada){ renderSlider(); sliderSudahRender = true; }
   renderKatalog();
 }
-
 function renderSlider(){
   let slidesContainer=document.getElementById('slidesContainer');
   let dotsContainer=document.getElementById('dotsContainer');
@@ -164,7 +215,6 @@ function renderSlider(){
   });
   showSlides(slideIndex);
 }
-
 function renderKatalog(){
   let container=document.getElementById('katalogContainer');
   if(dataMobil.length==0){container.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:#d4af37;">Belum ada data</div>';return;}
@@ -177,108 +227,178 @@ function renderKatalog(){
     container.innerHTML+=`<div class="katalog-card"><img src="${foto}"><div class="katalog-info"><h4>${m.merk||''} ${m.type||''}</h4><div style="font-size:12px;color:#666;">No Pol: ${m.plat||'-'} | ${m.tahun||''}</div><div class="harga">Rp ${harga}/Hari</div>${getStatus(m.status)}</div>${btnKatalog}</div>`;
   });
 }
-
-onSnapshot(collection(db,"armada_mobil"), (snap)=>{dataMobil=[]; snap.forEach(d=> dataMobil.push(norm({id:d.id, ...d.data()}))); renderAll();});
-onSnapshot(collection(db,"transaksi"), (snap)=>{dataTransaksi=[]; snap.forEach(d=> dataTransaksi.push({id:d.id, ...d.data()})); renderAll();});
-
-window.geserSlide=(n)=>{showSlides(slideIndex+=n)}; 
-window.currentSlide=(n)=>{showSlides(slideIndex=n)};
-
+db.collection("armada_mobil").onSnapshot((snap)=>{dataMobil=[]; snap.forEach(d=> dataMobil.push({id:d.id, ...d.data()})); dataMobil=dataMobil.map(norm); renderAll();});
+db.collection("transaksi").onSnapshot((snap)=>{dataTransaksi=[]; snap.forEach(d=> dataTransaksi.push({id:d.id, ...d.data()})); renderAll();});
+db.collection("users").onSnapshot((snap)=>{dataUser=[]; snap.forEach(d=> dataUser.push({id:d.id, ...d.data()})); renderAll();});
+function geserSlide(n){showSlides(slideIndex+=n)}; 
+function currentSlide(n){showSlides(slideIndex=n)};
 function showSlides(n){
-  let slides=document.querySelectorAll(".slide"); 
-  let dots=document.querySelectorAll(".dot"); 
-  if(!slides.length) return; 
-  if(n>slides.length){slideIndex=1} 
-  if(n<1){slideIndex=slides.length} 
-  let el=document.querySelector(".slides"); 
-  if(el) el.style.transform=`translateX(-${(slideIndex-1)*100}%)`; 
-  dots.forEach(d=>d.classList.remove("active")); 
-  if(dots[slideIndex-1]) dots[slideIndex-1].classList.add("active");
+  let slides=document.querySelectorAll(".slide"); let dots=document.querySelectorAll(".dot"); 
+  if(!slides.length) return; if(n>slides.length){slideIndex=1} if(n<1){slideIndex=slides.length} 
+  let el=document.querySelector(".slides"); if(el) el.style.transform=`translateX(-${(slideIndex-1)*100}%)`; 
+  dots.forEach(d=>d.classList.remove("active")); if(dots[slideIndex-1]) dots[slideIndex-1].classList.add("active");
 }
-
 setInterval(()=>{geserSlide(1)},6000);
-
-// ===== FUNGSI FONNTE GROUP YANG BENER BEB! =====
-async function updateGroupList(){
+async function buatBackup(){
+  document.getElementById('statusBackup').innerText = "⏳ Membuat backup...";
   try{
-    let res = await fetch(URL_FETCH_GROUP, {method:"POST", headers:{Authorization: WA_TOKEN}});
-    let data = await res.json();
-    console.log("✅ fetch-group:", data);
-    return true;
-  }catch(e){ console.log("❌ fetch-group error", e); return false; }
+    let armadaSnap = await db.collection("armada_mobil").get();
+    let trxSnap = await db.collection("transaksi").get();
+    let userSnap = await db.collection("users").get();
+    let armada = []; armadaSnap.forEach(d=>armada.push({id:d.id, ...d.data()}));
+    let trx = []; trxSnap.forEach(d=>trx.push({id:d.id, ...d.data()}));
+    let users = []; userSnap.forEach(d=>users.push({id:d.id, ...d.data()}));
+    let backup = { tanggal: new Date().toLocaleString('id-ID'), timestamp: Date.now(), armada_mobil: armada, transaksi: trx, users: users, total_armada: armada.length, total_transaksi: trx.length, total_user: users.length };
+    backupTerakhir = backup;
+    await db.collection("backups").add(backup);
+    let listLocal = JSON.parse(localStorage.getItem("apama_backups")||"[]");
+    listLocal.unshift(backup);
+    localStorage.setItem("apama_backups", JSON.stringify(listLocal.slice(0,20)));
+    downloadJSON(backup, "backup-apama-" + new Date().toISOString().slice(0,10) + ".json");
+    document.getElementById('statusBackup').innerText = `✅ Backup berhasil! ${armada.length} armada | ${trx.length} transaksi | ${users.length} user - Tersimpan di Firestore + ter-download JSON beb!`;
+    loadBackupList();
+  }catch(e){ document.getElementById('statusBackup').innerText = "❌ Gagal backup: " + e.message; }
 }
-
+function downloadJSON(data, namaFile){
+  let blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = namaFile;
+  a.click();
+}
+function exportBackupJSON(){
+  if(!backupTerakhir){ let listLocal = JSON.parse(localStorage.getItem("apama_backups")||"[]"); if(listLocal.length>0) backupTerakhir = listLocal[0]; }
+  if(!backupTerakhir){ alert("Belum ada backup beb! Klik Backup Sekarang dulu."); return; }
+  downloadJSON(backupTerakhir, "backup-apama-terakhir.json");
+  document.getElementById('statusBackup').innerText = "⬇️ JSON backup terakhir sudah di-download beb!";
+}
+async function loadBackupList(){
+  document.getElementById('tabelBackup').style.display = "table";
+  let tbody = document.querySelector("#tabelBackup tbody");
+  tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>⏳ Memuat backup...</td></tr>";
+  try{
+    let snap = await db.collection("backups").orderBy("timestamp","desc").limit(10).get();
+    if(snap.empty){ tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;color:#ef4444;'>Belum ada backup di Firestore beb. Klik Backup Sekarang dulu.</td></tr>"; return; }
+    let html = "";
+    snap.forEach(doc=>{
+      let b = doc.data();
+      html += `<tr><td>${b.tanggal||'-'}</td><td>${b.total_armada||0}</td><td>${b.total_transaksi||0}</td><td>${b.total_user||0}</td><td><button class="btn-backup btn-biru" style="padding:5px 10px;" onclick="lihatDetailBackup('${doc.id}')">👀 Lihat</button> <button class="btn-backup btn-hijau" style="padding:5px 10px;" onclick="restoreBackup('${doc.id}')">♻️ Restore</button></td></tr>`;
+    });
+    tbody.innerHTML = html;
+    document.getElementById('statusBackup').innerText = "✅ Ketemu " + snap.size + " backup di Firestore beb.";
+  }catch(e){ tbody.innerHTML = "<tr><td colspan='5'>❌ " + e.message + "</td></tr>"; }
+}
+async function lihatDetailBackup(id){
+  let doc = await db.collection("backups").doc(id).get();
+  let b = doc.data();
+  let el = document.getElementById('backupDetail');
+  el.style.display = "block";
+  el.innerText = "BACKUP TANGGAL: " + b.tanggal + "\n\nARMADA (" + b.total_armada + "):\n" + b.armada_mobil.map(m=>"- " + (m.merk||'') + " " + (m.type||'') + " | Plat: " + (m.plat||'-') + " | " + (m.status||'')).join("\n") + "\n\nTRANSAKSI (" + b.total_transaksi + "):\n" + b.transaksi.slice(0,10).map(t=>"- " + JSON.stringify(t).slice(0,120)).join("\n") + "\n\nUSER (" + b.total_user + "):\n" + b.users.map(u=>"- " + u.username + " / " + u.nama + " (" + u.role + ")").join("\n");
+  el.scrollIntoView({behavior:'smooth'});
+}
+async function restoreBackup(id){
+  let doc = await db.collection("backups").doc(id).get();
+  let b = doc.data();
+  restoreYangDipilih = {tipe:'firestore', id:id, data:b};
+  bukaModalWarning(b, "Firestore");
+}
+async function siapkanRestoreFile(event){
+  let file = event.target.files[0];
+  if(!file) return;
+  let text = await file.text();
+  let b = JSON.parse(text);
+  restoreYangDipilih = {tipe:'file', data:b, namaFile:file.name};
+  bukaModalWarning(b, "File: " + file.name);
+  event.target.value = "";
+}
+function bukaModalWarning(b, sumber){
+  document.getElementById('isiWarningRestore').innerHTML = `
+    <b>📦 Backup:</b> ${sumber} | ${b.tanggal || '-'}<br>
+    Isi Backup: <b>${b.total_armada||0} Armada | ${b.total_transaksi||0} Transaksi | ${b.total_user||0} User</b><br>
+    <b>📊 Sekarang:</b> <b>${dataMobil.length} Armada | ${dataTransaksi.length} Transaksi | ${dataUser.length} User</b>
+  `;
+  document.getElementById('cekSetuju').checked = false;
+  document.getElementById('ketikRestore').value = "";
+  document.getElementById('pesanKetik').innerText = "";
+  document.getElementById('btnKonfirmasiRestore').disabled = true;
+  document.getElementById('modalRestore').style.display = "flex";
+}
+function cekTombolRestore(){
+  let cek = document.getElementById('cekSetuju').checked;
+  let ketik = document.getElementById('ketikRestore').value.trim().toUpperCase();
+  let btn = document.getElementById('btnKonfirmasiRestore');
+  if(!cek){ btn.disabled = true; document.getElementById('pesanKetik').innerText = "⚠️ Centang dulu beb!"; return; }
+  if(ketik !== "RESTORE"){ btn.disabled = true; document.getElementById('pesanKetik').innerText = "⚠️ Ketik RESTORE dulu beb!"; return; }
+  btn.disabled = false;
+  document.getElementById('pesanKetik').innerText = "✅ Siap! Boleh klik YA, RESTORE beb.";
+  document.getElementById('pesanKetik').style.color = "#16a34a";
+}
+function tutupModalRestore(){
+  document.getElementById('modalRestore').style.display = "none";
+  restoreYangDipilih = null;
+  document.getElementById('statusBackup').innerText = "❌ Restore dibatalkan beb, data tidak berubah, aman!";
+}
+async function jalankanRestore(){
+  if(!restoreYangDipilih) return;
+  let b = restoreYangDipilih.data;
+  document.getElementById('modalRestore').style.display = "none";
+  document.getElementById('statusBackup').innerText = "⏳ Restore berjalan... cek satu-satu biar gak double beb...";
+  try{
+    let ditambah = 0, dilewati = 0;
+    for(let m of (b.armada_mobil||[])){
+      let sudahAda = await db.collection("armada_mobil").doc(m.id).get();
+      if(sudahAda.exists){ dilewati++; continue; }
+      let cekPlat = await db.collection("armada_mobil").where("plat","==", m.plat).get();
+      if(!cekPlat.empty){ dilewati++; continue; }
+      await db.collection("armada_mobil").doc(m.id).set(m);
+      ditambah++;
+    }
+    for(let t of (b.transaksi||[])){
+      let sudahAda = await db.collection("transaksi").doc(t.id).get();
+      if(sudahAda.exists){ dilewati++; continue; }
+      await db.collection("transaksi").doc(t.id).set(t);
+      ditambah++;
+    }
+    for(let u of (b.users||[])){
+      let sudahAda = await db.collection("users").doc(u.id).get();
+      if(sudahAda.exists){ dilewati++; continue; }
+      let cekUser = await db.collection("users").where("username","==", u.username).get();
+      if(!cekUser.empty){ dilewati++; continue; }
+      await db.collection("users").doc(u.id).set(u);
+      ditambah++;
+    }
+    document.getElementById('statusBackup').innerText = `✅ Restore selesai beb! Ditambah: ${ditambah} | Dilewati (udah ada / data baru): ${dilewati}`;
+    alert("✅ Restore selesai beb!\n\nDitambah (yang hilang): " + ditambah + " data\nDilewati (udah ada / data baru): " + dilewati + " data\n\nData baru Bapak aman, gak ketimpa, gak double!");
+    loadBackupList();
+  }catch(e){ alert("❌ Gagal restore: " + e.message); }
+}
+async function updateGroupList(){ try{ let res = await fetch(URL_FETCH_GROUP, {method:"POST", headers:{Authorization: WA_TOKEN}}); return true; }catch(e){ return false; } }
 async function getGroupIdRentalApama(){
   try{
     let res = await fetch(URL_GET_GROUP, {method:"POST", headers:{Authorization: WA_TOKEN}});
     let data = await res.json();
-    console.log("✅ get-whatsapp-group:", data);
     if(data && data.data && data.data.length>0){
-      let found = data.data.find(g => {
-        let name = (g.subject || g.name || "").toLowerCase();
-        return name.includes("apama") || name.includes("rental");
-      });
-      if(found){
-        GROUP_ID_RENTAL_APAMA = found.id || found.jid || found.group_id;
-        GROUP_NAME = found.subject || found.name || "Rental Apama";
-        localStorage.setItem("rental_apama_group_id", GROUP_ID_RENTAL_APAMA);
-        localStorage.setItem("rental_apama_group_name", GROUP_NAME);
-        document.getElementById('statusFirebase').innerText = `✅ GROUP KETEMU BEB: ${GROUP_NAME} - ID: ${GROUP_ID_RENTAL_APAMA}`;
-        return GROUP_ID_RENTAL_APAMA;
-      } else {
-        document.getElementById('statusFirebase').innerText = `List Group: ${data.data.map(g=>g.subject||g.name).join(", ")} | Gak ada Rental Apama beb, buat dulu groupnya beb! Invite HZ8HAZkVT2sChPO7j5jjq2`;
-      }
-    } else {
-      document.getElementById('statusFirebase').innerText = "⚠️ Group list kosong beb! Klik Phonebook -> WA Group -> Update List di app.fonnte.com/device beb!";
+      let found = data.data.find(g => { let name = (g.subject || g.name || "").toLowerCase(); return name.includes("apama") || name.includes("rental"); });
+      if(found){ GROUP_ID_RENTAL_APAMA = found.id || found.jid || found.group_id; GROUP_NAME = found.subject || found.name || "Rental Apama"; localStorage.setItem("rental_apama_group_id", GROUP_ID_RENTAL_APAMA); localStorage.setItem("rental_apama_group_name", GROUP_NAME); return GROUP_ID_RENTAL_APAMA; }
     }
-  }catch(e){ console.log("❌ get group error", e); }
+  }catch(e){}
   return null;
 }
-
-// ===== BOOKING MASUK HP + GROUP BEB! =====
 document.addEventListener('click', async function(e){
   if(e.target&&e.target.classList.contains('btnBooking')){
-    if(e.target.disabled) return;
-    e.preventDefault();
-    const btn=e.target; 
-    const namaMobil=btn.getAttribute('data-nama'); 
-    const harga=btn.getAttribute('data-harga'); 
-    const plat=btn.getAttribute('data-plat');
-    const tgl=prompt(`Booking ${namaMobil}\nPlat: ${plat}\nMau sewa tanggal berapa?`);
-    if(!tgl) return;
-
-    const pesan=`🔔 BOOKING BARU MASUK!\n\nMobil: ${namaMobil}\nPlat: ${plat}\nHarga: Rp${Number(harga).toLocaleString('id-ID')}/hari\nTanggal Sewa: ${tgl}\nSumber: panjepun.github.io/rentcar/\nGroup: Rental Apama HZ8HAZkVT2sChPO7j5jjq2`;
-
+    if(e.target.disabled) return; e.preventDefault();
+    const btn=e.target; const namaMobil=btn.getAttribute('data-nama'); const harga=btn.getAttribute('data-harga'); const plat=btn.getAttribute('data-plat');
+    const tgl=prompt(`Booking ${namaMobil}\nPlat: ${plat}\nMau sewa tanggal berapa?`); if(!tgl) return;
+    const pesan=`🔔 BOOKING BARU MASUK!\n\nMobil: ${namaMobil}\nPlat: ${plat}\nHarga: Rp${Number(harga).toLocaleString('id-ID')}/hari\nTanggal Sewa: ${tgl}\nSumber: APAMA RENTAL\nGroup: Rental Apama HZ8HAZkVT2sChPO7j5jjq2`;
     try{
-      // 1. Kirim ke HP Admin dulu beb - 6282340152478
       let fd1=new FormData(); fd1.append("target", NOMOR_WA_ADMIN); fd1.append("message", pesan);
-      let r1 = await fetch(URL_SEND, {method:"POST", headers:{Authorization: WA_TOKEN}, body: fd1});
-      let j1 = await r1.json();
-      console.log("Kirim HP:", j1);
-
-      // 2. Cek Group ID kalau belum ada beb
-      if(!GROUP_ID_RENTAL_APAMA){
-        await updateGroupList();
-        await new Promise(r=>setTimeout(r,2000)); // tunggu 2 detik biar ke-update beb
-        await getGroupIdRentalApama();
-      }
-
-      // 3. Kirim ke Group Rental Apama beb!
-      if(GROUP_ID_RENTAL_APAMA){
-        let fd2=new FormData(); fd2.append("target", GROUP_ID_RENTAL_APAMA); fd2.append("message", pesan);
-        let r2 = await fetch(URL_SEND, {method:"POST", headers:{Authorization: WA_TOKEN}, body: fd2});
-        let j2 = await r2.json();
-        console.log("Kirim Group:", j2);
-        if(j2.status){ alert("✅ Booking masuk HP "+NOMOR_WA_ADMIN+" + Group "+GROUP_NAME+" beb! Cek Group Rental Apama beb!"); }
-        else{ alert("✅ HP masuk, Group gagal: "+j2.reason+" - Pastikan udah klik Update List di Phonebook -> WA Group beb!"); }
-      } else {
-        alert("✅ Booking masuk HP beb! Group ID belum ketemu beb! Buka app.fonnte.com/device -> Phonebook -> WA Group -> Update List dulu beb! Invite HZ8HAZkVT2sChPO7j5jjq2");
-      }
+      await fetch(URL_SEND, {method:"POST", headers:{Authorization: WA_TOKEN}, body: fd1});
+      if(!GROUP_ID_RENTAL_APAMA){ await updateGroupList(); await new Promise(r=>setTimeout(r,2000)); await getGroupIdRentalApama(); }
+      if(GROUP_ID_RENTAL_APAMA){ let fd2=new FormData(); fd2.append("target", GROUP_ID_RENTAL_APAMA); fd2.append("message", pesan); let r2 = await fetch(URL_SEND, {method:"POST", headers:{Authorization: WA_TOKEN}, body: fd2}); let j2 = await r2.json(); if(j2.status){ alert("✅ Booking masuk HP + Group "+GROUP_NAME+" beb!"); } else { alert("✅ HP masuk, Group gagal: "+j2.reason); } }
+      else { alert("✅ Booking masuk HP beb!"); }
     }catch(err){ alert("❌ Error: "+err.message); }
   }
 });
-
-// Auto coba fetch group pas buka web (sekali aja beb, gak bikin macet slide beb)
 setTimeout(async ()=>{ if(!GROUP_ID_RENTAL_APAMA){ await getGroupIdRentalApama(); } }, 3000);
 </script>
 </body>
