@@ -7,98 +7,87 @@
 <style>
   body { font-family: sans-serif; background:#f5f5f5; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
   .card { background:#fff; padding:30px 25px; border-radius:16px; box-shadow:0 5px 20px rgba(0,0,0,0.1); width:90%; max-width:360px; text-align:center; }
-  h2 { margin:0 0 5px; }
-  p { color:#666; font-size:14px; }
   button { width:100%; padding:14px; border-radius:10px; border:none; font-size:16px; cursor:pointer; margin-top:10px; }
   .btn-daftar { background:#eee; }
   .btn-login { background:#000; color:#fff; }
   #status { margin-top:15px; font-size:13px; color:#d00; min-height:20px; }
-  .sukses { color:green !important; }
 </style>
 </head>
 <body>
-
 <div class="card">
   <h2>🚗 Rentcar Panjepun</h2>
   <p>Halo beb, login pake wajah dulu ya</p>
-
   <button class="btn-daftar" id="btnDaftar">1. Daftar Wajah Dulu</button>
   <button class="btn-login" id="btnLogin">2. Login dengan Wajah 😊</button>
-
   <p id="status"></p>
-  <p style="font-size:12px; color:#999;">Harus dibuka lewat https://panjepun.github.io/rentcar<br>biar Face ID nya jalan</p>
+  <p style="font-size:12px; color:#999;">Buka di Chrome / Safari, jangan dari WhatsApp ya beb</p>
 </div>
-
 <script>
 const statusEl = document.getElementById('status');
+function pesan(t){ statusEl.innerText = t; }
 
-function pesan(teks, sukses=false){
-  statusEl.innerText = teks;
-  statusEl.className = sukses ? 'sukses' : '';
+function buatChallenge(){
+  const arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  return arr;
 }
 
-// 1. DAFTAR WAJAH - CUMA 1x AJA
 document.getElementById('btnDaftar').onclick = async () => {
+  if(!window.isSecureContext){
+    pesan('Harus dibuka lewat https beb, jangan dari file / WhatsApp.');
+    return;
+  }
   if(!window.PublicKeyCredential){
-    pesan('HP / Browser ini belum support login wajah beb.');
+    pesan('HP ini belum support login wajah beb, coba di HP lain / Chrome terbaru.');
     return;
   }
   try {
-    pesan('Silahkan scan wajah / sidik jari...');
+    pesan('Tunggu... lagi minta izin Face ID, langsung scan ya beb...');
+    const challenge = buatChallenge();
     const credential = await navigator.credentials.create({
       publicKey: {
-        challenge: new Uint8Array([1,2,3,4,5,6,7,8]),
+        challenge: challenge,
         rp: { name: "Rentcar Panjepun", id: location.hostname },
-        user: {
-          id: new Uint8Array([9,9,9,9]),
-          name: "admin@rentcar",
-          displayName: "Admin Rental"
-        },
+        user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "admin@rentcar", displayName: "Admin Rental" },
         pubKeyCredParams: [{alg: -7, type: "public-key"}, {alg: -257, type: "public-key"}],
-        authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
-        timeout: 60000,
+        authenticatorSelection: { userVerification: "required" },
+        timeout: 120000,
+        attestation: "none"
       }
     });
-    // Simpan ID wajah di HP Bapak
     const rawId = new Uint8Array(credential.rawId);
     let str = '';
     rawId.forEach(b => str += String.fromCharCode(b));
     localStorage.setItem('wajah_id', btoa(str));
-    pesan('Berhasil daftar wajah! Sekarang pencet Login dengan Wajah.', true);
+    pesan('Berhasil daftar! Sekarang pencet no 2 beb.');
   } catch(e) {
-    pesan('Gagal daftar beb: ' + e.message);
+    if(e.name === 'NotAllowedError'){
+      pesan('Dibatalkan / timeout beb. Coba lagi, buka di Chrome langsung, pas muncul Face ID langsung scan, jangan kelamaan.');
+    } else {
+      pesan('Gagal: ' + e.message);
+    }
   }
 };
 
-// 2. LOGIN WAJAH -> KE DASHBOARD.HTML
 document.getElementById('btnLogin').onclick = async () => {
   try {
     const idSimpan = localStorage.getItem('wajah_id');
-    if(!idSimpan){
-      pesan('Belum daftar wajah beb, pencet tombol no 1 dulu!');
-      return;
-    }
+    if(!idSimpan){ pesan('Belum daftar beb, pencet no 1 dulu!'); return; }
     pesan('Silahkan scan wajah...');
     const allow = Uint8Array.from(atob(idSimpan), c => c.charCodeAt(0));
     await navigator.credentials.get({
       publicKey: {
-        challenge: new Uint8Array([1,2,3,4,5,6,7,8]),
+        challenge: buatChallenge(),
         allowCredentials: [{ id: allow, type: "public-key" }],
         userVerification: "required",
-        timeout: 60000,
+        timeout: 120000,
       }
     });
-
-    // === WAJAH COCOK, PINDAH KE DASHBOARD ===
-    pesan('Wajah cocok! Masuk ke dashboard...', true);
-    // Tandain udah login, biar dashboard tau
+    pesan('Wajah cocok! Masuk...');
     sessionStorage.setItem('sudah_login', 'ya');
-    setTimeout(() => {
-      window.location.href = 'dashboard.html';
-    }, 800);
-
+    setTimeout(()=>{ window.location.href = 'dashboard.html'; }, 800);
   } catch(e) {
-    pesan('Wajah tidak cocok / dibatalkan beb.');
+    pesan('Wajah tidak cocok / dibatalkan beb. Coba lagi.');
   }
 };
 </script>
