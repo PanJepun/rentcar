@@ -26,13 +26,13 @@ td{border-bottom:1px solid #e2e8f0;padding:10px;font-size:13px;}
 .td-aksi{display:flex;gap:8px;}
 .btn-aksi-kecil{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;width:auto;}
 .btn-edit-kecil{background:#f59e0b;color:#fff;}.btn-delete-kecil{background:#ef4444;color:#fff;}
+.btn-mata{background:#8b5cf6;color:#fff;border:none;padding:4px 9px;border-radius:6px;cursor:pointer;font-size:12px;width:auto;}
 </style>
 </head>
 <body>
 <nav>
   <div>🚗 APAMA RENTAL</div>
   <ul>
-    
     <li><a href="https://panjepun.github.io/rentcar/mobil.html">🚗 Data Armada</a></li>
     <li><a href="https://panjepun.github.io/rentcar/transaksi.html">Transaksi</a></li>
     <li><a href="https://panjepun.github.io/rentcar/tools.html" class="active">⚙️ Tools</a></li>
@@ -40,7 +40,7 @@ td{border-bottom:1px solid #e2e8f0;padding:10px;font-size:13px;}
 </nav>
 <div class="container">
   <p id="statusKonek" style="text-align:center;font-size:12px;font-weight:700;color:#b45309;">⏳ Menghubungkan ke Firestore rental2026...</p>
-  <p id="debugInfo" style="text-align:center;font-size:11px;color:#64748b;"></p>
+  <p id="debugInfo" style="text-align:center;font-size:12px;font-weight:700;color:#6d28d9;">⏳ Cek login...</p>
   <div class="card">
     <h2>👤 Tambah / Kelola Akun Pengguna</h2>
     <form id="formUser">
@@ -64,13 +64,12 @@ td{border-bottom:1px solid #e2e8f0;padding:10px;font-size:13px;}
   </div>
   <div class="card" style="margin-top:20px;">
     <h2>Daftar Pengguna Aktif <span id="jumlahUser" style="font-size:12px;color:#10b981;"></span></h2>
-    <table id="tableUser"><thead><tr><th>Username</th><th>Nama Lengkap</th><th>Role</th><th width="180">Aksi</th></tr></thead><tbody><tr><td colspan="4" style="text-align:center;color:#94a3b8;">⏳ Memuat data...</td></tr></tbody></table>
+    <table id="tableUser"><thead><tr><th>Username</th><th>Nama Lengkap</th><th>Role</th><th id="thPassword" style="display:none;">Password</th><th width="180">Aksi</th></tr></thead><tbody><tr><td colspan="5" style="text-align:center;color:#94a3b8;">⏳ Memuat data...</td></tr></tbody></table>
   </div>
 </div>
-
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyAYDuYpHiGqKLaGE__-fp-h00pUIAZGv7Vs",
+  apiKey: "PAKAI_API_KEY_LAMA_BAPAK",
   authDomain: "rental2026.firebaseapp.com",
   projectId: "rental2026",
   storageBucket: "rental2026.firebasestorage.app",
@@ -80,63 +79,78 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 let editUserId = null;
+let cachePass = {};
 
+// ===== INI KUNCINYA BEB - BACA apama_user YANG DISIMPAN login.html =====
+// login.html Bapak nyimpennya: {username:"master", isMaster:true} kalau Master
+// Kalau Doden: {username:"doden", isMaster:false}
+// Jadi kita cek 2-2nya, jangan cuma 1.
+function cekMaster(){
+  try{
+    let raw = localStorage.getItem("apama_user") || "{}";
+    let u = JSON.parse(raw);
+    let isMaster = (u.isMaster === true || String(u.username||"").toLowerCase() === "master");
+    let debug = document.getElementById('debugInfo');
+    if(debug){
+      if(isMaster) debug.innerText = "👑 Login MASTER (" + (u.username||"") + ") - kolom Password DITAMPILKAN";
+      else debug.innerText = "Login: " + (u.username||"belum login") + " - kolom Password DISEMBUNYIKAN";
+    }
+    let th = document.getElementById('thPassword');
+    if(th && isMaster) th.style.display = "table-cell";
+    if(th && !isMaster) th.style.display = "none";
+    return isMaster;
+  }catch(e){
+    document.getElementById('debugInfo').innerText = "Gagal baca login: " + e.message;
+    return false;
+  }
+}
+let isMasterTools = cekMaster();
+// Cek lagi 500ms sesudahnya beb, biar kalau tadi kelewat, sekarang kekejar
+setTimeout(()=>{ isMasterTools = cekMaster(); }, 500);
+
+function lihatPassTools(id, tombol){
+  let span = document.getElementById('pass-' + id);
+  let passAsli = cachePass[id] || '';
+  if(span.textContent === "••••••"){ span.textContent = passAsli; tombol.textContent = "🙈"; }
+  else { span.textContent = "••••••"; tombol.textContent = "👁️"; }
+}
 function setStatus(msg, color){
   document.getElementById('statusKonek').innerText = msg;
   document.getElementById('statusKonek').style.color = color;
 }
-
-// INI YANG BENER BEB - PAKAI FIRESTORE, SAMA KAYAK DASHBOARD
 db.collection("users").onSnapshot((snapshot) => {
+  isMasterTools = cekMaster();
   setStatus("✅ Tersambung ke Firestore rental2026 - Ketemu " + snapshot.size + " user", "green");
   document.getElementById('jumlahUser').innerText = "(" + snapshot.size + " user)";
   let html = "";
+  let colspanKosong = isMasterTools ? 5 : 4;
   if(snapshot.empty){
-    html = `<tr><td colspan="4" style="text-align:center;color:#ef4444;">Belum ada user di Firestore / collection 'users' kosong beb. Coba simpan 1 user baru di atas.</td></tr>`;
+    html = `<tr><td colspan="${colspanKosong}" style="text-align:center;color:#ef4444;">Belum ada user di Firestore beb.</td></tr>`;
   } else {
     snapshot.forEach((doc) => {
       let u = doc.data();
-      html += `
-        <tr>
-          <td><b>${u.username || '-'}</b></td>
-          <td>${u.nama || '-'}</td>
-          <td><span class="role-badge">${u.role || '-'}</span></td>
-          <td class="td-aksi">
-            <button class="btn-aksi-kecil btn-edit-kecil" onclick="editUser('${doc.id}')">✏️ Edit</button>
-            <button class="btn-aksi-kecil btn-delete-kecil" onclick="hapusUser('${doc.id}')" ${u.role=="Admin/Owner"?"disabled":""}>🗑️ Hapus</button>
-          </td>
-        </tr>`;
+      cachePass[doc.id] = u.password || '';
+      let kolomPassword = "";
+      if(isMasterTools){
+        kolomPassword = `<td><span id="pass-${doc.id}">••••••</span> <button class="btn-mata" onclick="lihatPassTools('${doc.id}', this)">👁️</button></td>`;
+      }
+      html += `<tr><td><b>${u.username || '-'}</b></td><td>${u.nama || '-'}</td><td><span class="role-badge">${u.role || '-'}</span></td>${kolomPassword}<td class="td-aksi"><button class="btn-aksi-kecil btn-edit-kecil" onclick="editUser('${doc.id}')">✏️ Edit</button><button class="btn-aksi-kecil btn-delete-kecil" onclick="hapusUser('${doc.id}')" ${u.role=="Admin/Owner"?"disabled":""}>🗑️ Hapus</button></td></tr>`;
     });
   }
   document.querySelector("#tableUser tbody").innerHTML = html;
 }, (error) => {
   setStatus("❌ GAGAL: " + error.message, "red");
-  document.getElementById('debugInfo').innerText = "Error code: " + error.code + " - Cek di Firebase: Build -> Firestore Database -> Rules harus allow read, write: if true";
-  console.error("Firestore error:", error);
 });
-
 document.getElementById('formUser').addEventListener("submit", async (e)=>{
   e.preventDefault();
-  let data = {
-    username: document.getElementById('username').value,
-    nama: document.getElementById('namaLengkap').value,
-    password: document.getElementById('password').value,
-    role: document.getElementById('roleUser').value
-  };
+  let data = {username: document.getElementById('username').value, nama: document.getElementById('namaLengkap').value, password: document.getElementById('password').value, role: document.getElementById('roleUser').value};
   try{
-    if(editUserId == null){
-      await db.collection("users").add(data);
-    } else {
-      await db.collection("users").doc(editUserId).set(data);
-      editUserId = null;
-    }
+    if(editUserId == null){ await db.collection("users").add(data); }
+    else { await db.collection("users").doc(editUserId).set(data); editUserId = null; }
     e.target.reset();
-    alert("✅ User tersimpan ke Firestore rental2026!");
-  }catch(err){
-    alert("❌ Gagal simpan: " + err.message);
-  }
+    alert("✅ User tersimpan!");
+  }catch(err){ alert("❌ Gagal simpan: " + err.message); }
 });
-
 async function editUser(id){
   let doc = await db.collection("users").doc(id).get();
   let u = doc.data();
@@ -147,7 +161,6 @@ async function editUser(id){
   editUserId = id;
   window.scrollTo({top:0, behavior:'smooth'});
 }
-
 async function hapusUser(id){
   if(confirm("Hapus user ini?")) await db.collection("users").doc(id).delete();
 }

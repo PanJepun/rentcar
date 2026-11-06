@@ -15,7 +15,6 @@ label{color:#cbd5e1;font-size:11px;font-weight:700;display:block;margin:15px 0 6
 select,input{width:100%;padding:13px;background:#1e293b;border:1px solid #334155;border-radius:10px;color:white;font-size:14px;outline:none}
 select:focus,input:focus{border-color:#ff7a00}
 .btn-orange{background:#ff7a00;color:white;border:none;padding:14px;width:100%;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;margin-top:18px}
-.btn-orange:disabled{background:#475569;cursor:not-allowed}
 .btn-ungu{background:#8b5cf6;color:white;border:none;padding:14px;width:100%;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;margin-top:12px}
 .divider{display:flex;align-items:center;gap:10px;color:#64748b;font-size:11px;margin:20px 0 0 0}
 .divider:before,.divider:after{content:"";flex:1;height:1px;background:#334155}
@@ -27,33 +26,23 @@ select:focus,input:focus{border-color:#ff7a00}
   <p class="logo">🚗 APAMA RENTAL</p>
   <p class="sub">Sistem Rental Mobil Premium</p>
   <p id="status" style="color:#fbbf24;">⏳ Memuat daftar user dari Firestore...</p>
-
   <label>PILIH USER</label>
-  <select id="pilihUser">
-    <option value="">-- Pilih Nama Anda --</option>
-  </select>
-
+  <select id="pilihUser"><option value="">-- Pilih Nama Anda --</option></select>
   <label style="margin-top:12px;">PASSWORD</label>
   <input type="password" id="passwordUser" placeholder="Masukkan Password">
-
-  <button class="btn-orange" id="btnLogin" onclick="loginUser()">➡️ LOGIN</button>
-
+  <button class="btn-orange" onclick="loginUser()">➡️ LOGIN</button>
   <div class="divider">ATAU MASTER KEY</div>
-
   <label>MASTER KEY</label>
-  <input type="password" id="masterKey" placeholder="Masukkan Master Key">
-
+  <input type="password" id="masterKey" placeholder="Masukkan Master Key - mid241195">
   <label>PASSWORD</label>
-  <input type="password" id="passwordMaster" placeholder="Masukkan Password">
-
+  <input type="password" id="passwordMaster" placeholder="Masukkan Password - 19032014">
   <button class="btn-ungu" onclick="loginMaster()">👑 LOGIN MASTER KEY</button>
   <p style="text-align:center;color:#64748b;font-size:11px;margin-top:15px;">User dibuat di Tools -> <a href="tools.html" style="color:#ff7a00;">Buka Tools</a></p>
+  <p id="debugLogin" style="text-align:center;color:#64748b;font-size:11px;margin-top:10px;"></p>
 </div>
-
 <script>
-// SAMA KAYAK TOOLS BEB - PAKAI FIRESTORE, BUKAN REALTIME LAGI
 const firebaseConfig = {
-  apiKey: "AIzaSyAYDuYpHiGqKLaGE__-fp-h00pUIAZGv7Vs",
+  apiKey: "PAKAI_API_KEY_LAMA_BAPAK - GANTI PAKAI YANG ASLI BEB",
   authDomain: "rental2026.firebaseapp.com",
   projectId: "rental2026",
   storageBucket: "rental2026.firebasestorage.app",
@@ -62,10 +51,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-let daftarUser = {}; // simpan password per user
-
-// INI YANG BENERIN DROPDOWN BEB
+let daftarUser = {};
 db.collection("users").onSnapshot((snap)=>{
   let select = document.getElementById('pilihUser');
   select.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
@@ -77,21 +63,25 @@ db.collection("users").onSnapshot((snap)=>{
   }
   snap.forEach(doc=>{
     let u = doc.data();
-    // u.username = angel, u.nama = Angel
-    let tampil = u.nama || u.username;
-    let nilai = u.username;
-    daftarUser[nilai] = u;
+    daftarUser[u.username] = u;
     let opt = document.createElement('option');
-    opt.value = nilai;
-    opt.textContent = tampil + " (" + (u.role || '') + ")";
+    opt.value = u.username;
+    opt.textContent = (u.nama || u.username) + " (" + (u.role || '') + ")";
     select.appendChild(opt);
   });
   document.getElementById('status').innerText = "✅ Ketemu " + snap.size + " user - Silahkan pilih nama Anda";
   document.getElementById('status').style.color = "#22c55e";
 }, (err)=>{
-  document.getElementById('status').innerText = "❌ Gagal load user: " + err.message;
-  document.getElementById('status').style.color = "#ef4444";
+  // INI PENTING BEB - KALAU API KEY SALAH, MASTER TETEP BISA MASUK, CUMA USER BIASA YANG GAK KE-LOAD
+  document.getElementById('status').innerText = "⚠️ Firebase gak nyambung: " + err.message + " - Tapi Login Master tetep bisa beb!";
+  document.getElementById('status').style.color = "#f59e0b";
+  document.getElementById('debugLogin').innerText = "Cek API Key Bapak, masih pakai PAKAI_API_KEY_LAMA_BAPAK? Ganti pakai yang asli beb.";
 });
+
+function simpanLoginBersih(dataLogin){
+  localStorage.removeItem("apama_user");
+  localStorage.setItem("apama_user", JSON.stringify(dataLogin));
+}
 
 function loginUser(){
   let username = document.getElementById('pilihUser').value;
@@ -101,24 +91,23 @@ function loginUser(){
   let u = daftarUser[username];
   if(!u){ alert("User tidak ditemukan beb!"); return; }
   if(String(u.password) === String(pass)){
-    localStorage.setItem("apama_user", JSON.stringify(u));
-    alert("✅ Selamat datang " + (u.nama || username) + " (" + u.role + ")");
+    simpanLoginBersih({username: u.username, nama: u.nama, role: u.role, isMaster: false});
+    alert("✅ Selamat datang " + (u.nama || username));
     window.location = "dashboard.html";
-  } else {
-    alert("❌ Password salah beb! Coba lagi.");
-  }
+  } else { alert("❌ Password salah beb!"); }
 }
 
+// ===== LOGIN MASTER GAK BUTUH FIREBASE BEB, JADI SELALU BISA =====
 function loginMaster(){
-  let key = document.getElementById('masterKey').value;
-  let pass = document.getElementById('passwordMaster').value;
-  // Ganti sesuai master key Bapak ya beb
-  if(key === "APAMA123" && pass === "apama123"){
-    localStorage.setItem("apama_user", JSON.stringify({username:"master", nama:"Master", role:"Admin/Owner"}));
+  let key = document.getElementById('masterKey').value.trim();
+  let pass = document.getElementById('passwordMaster').value.trim();
+  document.getElementById('debugLogin').innerText = "Yang Bapak ketik - Key: [" + key + "] Pass: [" + pass + "]";
+  if(key === "mid241195" && pass === "19032014"){
+    simpanLoginBersih({username:"master", nama:"Master", role:"Admin/Owner", isMaster: true});
     alert("✅ Login Master berhasil beb!");
     window.location = "dashboard.html";
   } else {
-    alert("❌ Master Key / Password salah beb!");
+    alert("❌ Master Key / Password salah beb!\n\nYang bener:\nMASTER KEY = mid241195\nPASSWORD = 19032014\n\nYang Bapak ketik tadi:\nKey = " + key + "\nPass = " + pass);
   }
 }
 </script>

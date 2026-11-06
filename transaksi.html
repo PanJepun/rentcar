@@ -125,7 +125,10 @@ onSnapshot(collection(db, "armada_mobil"), s => { dataMobil = s.docs.map(d=>({id
 onSnapshot(collection(db, "transaksi"), s => { dataTransaksi = s.docs.map(d=>({id:d.id, ...d.data()})); loadTabelTransaksi(); updateStatus(); });
 onSnapshot(doc(db, "setup", "invoice"), async s => { if(s.exists()){ setupInvoice = s.data(); } else { await setDoc(doc(db, "setup", "invoice"), setupInvoice); } generateInvoice(); });
 function updateStatus(){ document.getElementById('statusFirebase').innerText = '✅ FIREBASE rental2026 TERHUBUNG - Transaksi: ' + dataTransaksi.length + ' | Mobil: ' + dataMobil.length + ' | Customer: ' + dataCustomer.length; document.getElementById('statusFirebase').style.color = 'green'; }
-function hitungOtomatis(){ hitungTotal(); }
+
+// ===== FIX BEB - hitungOtomatis harus di window karena script type="module" =====
+// Kalau tidak pakai window, onchange="hitungOtomatis()" di HTML akan error & Jumlah Hari tidak pernah keisi.
+window.hitungOtomatis = function(){ window.hitungTotal(); };
 
 async function kirimWAOwnerSilent(pesan){
   try{
@@ -223,25 +226,60 @@ id_customer.addEventListener('change', function(){
   let c = dataCustomer.find(x => x.id == this.value) || dataCustomerReguler.find(x => x.id == this.value);
   if(c){ let alamat = c.hotel ? `${c.hotel} Rm.${c.room_no}` : c.alamat; info_customer.innerHTML = `HP: ${c.no_hp} | ${alamat}`; }
 });
-id_mobil.addEventListener('change', function(){ let m = dataMobil.find(x => x.id == this.value); if(m){ harga.value = m.harga || 0; hitungTotal(); } });
-harga.addEventListener('input', hitungTotal);
-function hitungTotal(){
-  let tgl1 = new Date(tgl_sewa.value + 'T' + jam_keluar.value);
-  let tgl2 = new Date(tgl_kembali.value + 'T' + jam_kembali.value);
-  let hargaVal = parseInt(harga.value) || 0;
-  let depositVal = parseInt(deposit.value) || 0;
-  if(tgl1 && tgl2 && tgl2 >= tgl1){
-    let selisihMs = tgl2 - tgl1; let selisihJam = selisihMs / (1000 * 60 * 60);
-    let hari = Math.ceil(selisihJam / 24); if(hari == 0) hari = 1;
-    let overtime = 0; let sisaJam = selisihJam - (hari * 24); if(sisaJam > 0){ overtime = Math.ceil(sisaJam); }
-    let totalSewa = hari * hargaVal; let totalOT = overtime * (hargaVal * 0.1); let total = totalSewa + totalOT;
+id_mobil.addEventListener('change', function(){ let m = dataMobil.find(x => x.id == this.value); if(m){ harga.value = m.harga || 0; window.hitungTotal(); } });
+harga.addEventListener('input', function(){ window.hitungTotal(); });
+// ===== FIX TAMBAHAN BEB - pasang listener juga biar gak cuma ngandelin onchange =====
+['tgl_sewa','tgl_kembali','jam_keluar','jam_kembali','deposit','jumlah_helm'].forEach(function(id){
+  let el = document.getElementById(id);
+  if(el){ el.addEventListener('change', function(){ window.hitungTotal(); }); el.addEventListener('input', function(){ window.hitungTotal(); }); }
+});
+
+// ===== FIX UTAMA BEB - HITUNG JUMLAH HARI + TOTAL =====
+// Logika baru: hari = full 24 jam. Sisa jam di bawah 24 jam masuk Overtime, bukan jadi hari baru.
+// Contoh SS Bapak: 14/11 08:00 -> 21/11 18:00 = 178 jam = 7 hari + 10 jam overtime.
+// Standar Sewa TIDAK ditimpa lagi, tetap 10 beb.
+window.hitungTotal = function(){
+  let elTglSewa = document.getElementById('tgl_sewa');
+  let elTglKembali = document.getElementById('tgl_kembali');
+  let elJamKeluar = document.getElementById('jam_keluar');
+  let elJamKembali = document.getElementById('jam_kembali');
+  let elHarga = document.getElementById('harga');
+  let elDeposit = document.getElementById('deposit');
+  if(!elTglSewa || !elTglKembali) return;
+  let tgl1 = new Date(elTglSewa.value + 'T' + (elJamKeluar ? elJamKeluar.value || '08:00' : '08:00'));
+  let tgl2 = new Date(elTglKembali.value + 'T' + (elJamKembali ? elJamKembali.value || '18:00' : '18:00'));
+  let hargaVal = parseInt(elHarga ? elHarga.value : 0) || 0;
+  let depositVal = parseInt(elDeposit ? elDeposit.value : 0) || 0;
+  if(elTglSewa.value && elTglKembali.value && !isNaN(tgl1) && !isNaN(tgl2) && tgl2 >= tgl1){
+    let selisihMs = tgl2 - tgl1;
+    let selisihJam = selisihMs / (1000 * 60 * 60);
+    let hari = Math.floor(selisihJam / 24);
+    if(hari == 0) hari = 1;
+    // Sisa jam setelah hari penuh = overtime. Kalau pas 24 jam kelipatan, overtime 0.
+    let overtime = 0;
+    if(selisihJam >= 24){
+      overtime = Math.round(selisihJam - (hari * 24));
+    } else {
+      overtime = 0;
+    }
+    if(overtime < 0) overtime = 0;
+    let totalSewa = hari * hargaVal;
+    let totalOT = overtime * (hargaVal * 0.1);
+    let total = totalSewa + totalOT;
     let sisa = total - depositVal; if(sisa < 0) sisa = 0;
     document.getElementById('overtime').value = overtime > 0 ? overtime + ' Jam' : '0 Jam';
     document.getElementById('total_bayar').innerText = total.toLocaleString('id-ID');
     document.getElementById('sisa_piutang').innerText = sisa.toLocaleString('id-ID');
     document.getElementById('jumlah_hari').value = hari;
-    document.getElementById('standar_sewa').value = hari;
-  } else { document.getElementById('overtime').value = ''; document.getElementById('total_bayar').innerText = '0'; document.getElementById('sisa_piutang').innerText = '0'; }
+    // JANGAN timpa standar_sewa beb, biarkan tetap 10
+  } else {
+    // Kalau tanggal belum lengkap, jangan hapus jumlah hari yang sudah ada beb, cuma reset total
+    if(!elTglSewa.value || !elTglKembali.value){
+      document.getElementById('overtime').value = '';
+      document.getElementById('total_bayar').innerText = '0';
+      document.getElementById('sisa_piutang').innerText = '0';
+    }
+  }
   if(document.querySelector('input[name="jenis_cus"]:checked').value == 'kredit'){ info_piutang.style.display = 'block'; } else { info_piutang.style.display = 'none'; }
 }
 window.editTransaksi = function(id){
@@ -253,7 +291,7 @@ window.editTransaksi = function(id){
   loadDropdownMobil();
   setTimeout(() => { id_customer.value = t.id_customer; id_mobil.value = t.id_mobil; id_customer.disabled = true; if(!document.getElementById('info_lock_cus')){ let info=document.createElement('div'); info.id='info_lock_cus'; info.className='info-lock'; info.innerHTML='🔒 Customer tidak bisa diganti saat edit'; id_customer.parentNode.appendChild(info); } }, 100);
   tgl_sewa.value = t.tgl_sewa; jam_keluar.value = t.jam_keluar || '08:00'; tgl_kembali.value = t.tgl_kembali; jam_kembali.value = t.jam_kembali || '18:00'; standar_sewa.value = t.standar_sewa || 10; km_keluar.value = t.km_keluar; km_masuk.value = t.km_masuk; harga.value = t.harga; deposit.value = t.deposit || 0; jumlah_helm.value = t.jumlah_helm || 0; if(t.bukti_tf){ buktiBase64 = t.bukti_tf; preview_bukti.innerHTML = `<img src="${t.bukti_tf}" class="preview-bukti">`; }
-  hitungTotal(); btnSimpan.innerHTML = 'UPDATE TRANSAKSI'; btnSimpan.style.background = '#007bff'; btnBatal.style.display = 'inline-block'; window.scrollTo(0, 0);
+  window.hitungTotal(); btnSimpan.innerHTML = 'UPDATE TRANSAKSI'; btnSimpan.style.background = '#007bff'; btnBatal.style.display = 'inline-block'; window.scrollTo(0, 0);
 };
 window.batalEdit = function(){
   idEdit = null; document.getElementById('formTransaksi').reset(); buktiBase64 = ''; preview_bukti.innerHTML = '';

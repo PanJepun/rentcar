@@ -67,7 +67,7 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 .backup-table th{background:#1a2a4a;color:white;padding:8px;text-align:left;font-size:12px}
 .backup-table td{border-bottom:1px solid #ddd;padding:8px;font-size:12px}
 #backupDetail{background:#0a1629;color:#d4af37;padding:12px;border-radius:8px;font-size:11px;white-space:pre-wrap;max-height:300px;overflow:auto;display:none;margin-top:10px}
-/* WARNING 1 LAYAR - FIX BEB, TOMBOL SELALU KELIHATAN */
+.master-box{background:#f5f3ff;border:2px solid #8b5cf6;border-radius:8px;padding:15px;margin-top:18px}
 .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:999;padding:10px;box-sizing:border-box}
 .modal-box{background:white;border-radius:12px;max-width:440px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.5)}
 .modal-head{background:#dc2626;color:white;padding:10px 12px;text-align:center;flex-shrink:0}
@@ -130,12 +130,16 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
   <table class="backup-table" id="tabelBackup" style="display:none;"><thead><tr><th>Tanggal Backup</th><th>Armada</th><th>Transaksi</th><th>User</th><th>Aksi</th></tr></thead><tbody></tbody></table>
   <div id="backupDetail"></div>
 </div>
+<div class="master-box" id="boxLihatPassword" style="display:none;">
+  <h3 style="margin:0 0 5px 0;color:#6d28d9;">👑 KHUSUS MASTER - LIHAT PASSWORD USER</h3>
+  <p style="font-size:12px;color:#64748b;margin:0 0 10px 0;">Hanya muncul kalau Bapak login pakai Master Key. Karyawan tidak bisa lihat ini beb.</p>
+  <button class="btn-backup btn-ungu" onclick="lihatUserTerdaftar()">👁️ Lihat User + Password</button>
+  <div id="daftarUser"></div>
+</div>
 </div>
 <h3 class="katalog-title">KATALOG ARMADA KAMI - rental2026</h3>
 <div class="katalog-grid" id="katalogContainer"></div>
 </div>
-
-<!-- MODAL WARNING 1 LAYAR BEB -->
 <div class="modal-bg" id="modalRestore" onclick="if(event.target===this) tutupModalRestore()">
   <div class="modal-box">
     <div class="modal-head"><h2>⚠️ MAU RESTORE DATA?</h2><p>Baca sebentar aja beb, jangan asal klik!</p></div>
@@ -156,10 +160,9 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
     </div>
   </div>
 </div>
-
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyAYDuYpHiGqKLaGE__-fp-h00pUIAZGv7Vs",
+  apiKey: "PAKAI_API_KEY_LAMA_BAPAK",
   authDomain: "rental2026.firebaseapp.com",
   projectId: "rental2026",
   storageBucket: "rental2026.firebasestorage.app",
@@ -171,7 +174,7 @@ const db = firebase.firestore();
 const URL_FETCH_GROUP = "https://api.fonnte.com/fetch-group";
 const URL_GET_GROUP = "https://api.fonnte.com/get-whatsapp-group";
 const URL_SEND = "https://api.fonnte.com/send";
-const WA_TOKEN = "AHdnAppaZGYiKcaWt1JH";
+const WA_TOKEN = "PAKAI_TOKEN_LAMA_BAPAK";
 const NOMOR_WA_ADMIN = "6282340152478";
 let GROUP_ID_RENTAL_APAMA = localStorage.getItem("rental_apama_group_id") || "";
 let GROUP_NAME = localStorage.getItem("rental_apama_group_name") || "Rental Apama";
@@ -179,7 +182,44 @@ let dataMobil = []; let dataTransaksi = []; let dataUser = [];
 let slideIndex = 1; let sliderSudahRender = false;
 let backupTerakhir = null;
 let restoreYangDipilih = null;
+let cachePassDashboard = {};
 document.getElementById('tgl_sekarang').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// CEK MASTER STRICT BEB - CUMA BACA apama_user, GAK SCAN-SCAN LAGI
+// Jadi login Doden -> isMaster false -> kotak ungu ke-hide. Login Master -> isMaster true -> kotak nongol.
+function getUserLogin(){
+  try{ return JSON.parse(localStorage.getItem("apama_user") || "{}"); }catch(e){ return {}; }
+}
+window.addEventListener('load', function(){
+  let user = getUserLogin();
+  let box = document.getElementById('boxLihatPassword');
+  if(user.isMaster === true){ if(box) box.style.display = "block"; }
+  else { if(box) box.style.display = "none"; }
+});
+async function lihatUserTerdaftar(){
+  let user = getUserLogin();
+  if(user.isMaster !== true){ alert("Maaf beb, cuma Master yang boleh lihat!"); return; }
+  let tempat = document.getElementById('daftarUser');
+  tempat.innerHTML = "⏳ Lagi ngeload beb...";
+  try{
+    let snapshot = await db.collection("users").get();
+    if(snapshot.empty){ tempat.innerHTML = "Belum ada user beb."; return; }
+    let html = `<table class="backup-table" style="display:table;"><thead><tr><th>Nama</th><th>Username</th><th>Role</th><th>Password</th><th>Lihat</th></tr></thead><tbody>`;
+    snapshot.forEach(doc => {
+      let u = doc.data();
+      cachePassDashboard[doc.id] = u.password || '';
+      html += `<tr><td>${u.nama || '-'}</td><td>${u.username || '-'}</td><td>${u.role || '-'}</td><td><span id="pass-${doc.id}">••••••</span></td><td><button class="btn-backup btn-ungu" style="padding:5px 10px;" onclick="lihatPassUser('${doc.id}', this)">👁️</button></td></tr>`;
+    });
+    html += `</tbody></table>`;
+    tempat.innerHTML = html;
+  }catch(e){ tempat.innerHTML = "Error: "+e.message; }
+}
+function lihatPassUser(id, tombol){
+  let span = document.getElementById('pass-' + id);
+  let passwordAsli = cachePassDashboard[id] || '';
+  if(span.textContent === "••••••"){ span.textContent = passwordAsli; tombol.textContent = "🙈"; }
+  else { span.textContent = "••••••"; tombol.textContent = "👁️"; }
+}
 function norm(m){return {...m,status: m.status_mobil || m.status || 'Ada',foto: m.foto || m.foto_mobil || '',plat: m.plat || m.no_polisi || '-',merk: m.merk || '',type: m.type || '',};}
 function getStatus(status){let s=String(status||'ADA').toUpperCase(); if(s=='KELUAR') return '<span class="status-keluar">KELUAR</span>'; return '<span class="status-ada">ADA</span>';}
 function renderAll(){
