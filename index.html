@@ -33,9 +33,9 @@ select:focus,input:focus{border-color:#ff7a00}
   <button class="btn-orange" onclick="loginUser()">➡️ LOGIN</button>
   <div class="divider">ATAU MASTER KEY</div>
   <label>MASTER KEY</label>
-  <input type="password" id="masterKey" placeholder="Masukkan Master Key - mid241195">
+  <input type="password" id="masterKey" placeholder="Masukkan Master Key -">
   <label>PASSWORD</label>
-  <input type="password" id="passwordMaster" placeholder="Masukkan Password - 19032014">
+  <input type="password" id="passwordMaster" placeholder="Masukkan Password -">
   <button class="btn-ungu" onclick="loginMaster()">👑 LOGIN MASTER KEY</button>
   <p style="text-align:center;color:#64748b;font-size:11px;margin-top:15px;">User dibuat di Tools -> <a href="tools.html" style="color:#ff7a00;">Buka Tools</a></p>
   <p id="debugLogin" style="text-align:center;color:#64748b;font-size:11px;margin-top:10px;"></p>
@@ -51,6 +51,13 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// ISI DI HP BAPAK SENDIRI YA BEB, JANGAN DIKIRIM KE SINI
+// Baris 1 = Master Key yang lama
+// Baris 2 = Password baru yang Bapak sebut tadi
+const MASTER_KEY_BENAR = "mid241195";
+const PASSWORD_MASTER_BENAR = "28Maret2024*#";
+
 let daftarUser = {};
 db.collection("users").onSnapshot((snap)=>{
   let select = document.getElementById('pilihUser');
@@ -72,10 +79,9 @@ db.collection("users").onSnapshot((snap)=>{
   document.getElementById('status').innerText = "✅ Ketemu " + snap.size + " user - Silahkan pilih nama Anda";
   document.getElementById('status').style.color = "#22c55e";
 }, (err)=>{
-  // INI PENTING BEB - KALAU API KEY SALAH, MASTER TETEP BISA MASUK, CUMA USER BIASA YANG GAK KE-LOAD
   document.getElementById('status').innerText = "⚠️ Firebase gak nyambung: " + err.message + " - Tapi Login Master tetep bisa beb!";
   document.getElementById('status').style.color = "#f59e0b";
-  document.getElementById('debugLogin').innerText = "Cek API Key Bapak, masih pakai PAKAI_API_KEY_LAMA_BAPAK? Ganti pakai yang asli beb.";
+  document.getElementById('debugLogin').innerText = "Cek API Key Bapak, masih pakai yang lama? Ganti pakai yang asli beb.";
 });
 
 function simpanLoginBersih(dataLogin){
@@ -97,17 +103,15 @@ function loginUser(){
   } else { alert("❌ Password salah beb!"); }
 }
 
-// ===== LOGIN MASTER GAK BUTUH FIREBASE BEB, JADI SELALU BISA =====
 function loginMaster(){
   let key = document.getElementById('masterKey').value.trim();
   let pass = document.getElementById('passwordMaster').value.trim();
-  document.getElementById('debugLogin').innerText = "Yang Bapak ketik - Key: [" + key + "] Pass: [" + pass + "]";
-  if(key === "mid241195" && pass === "19032014"){
+  if(key === MASTER_KEY_BENAR && pass === PASSWORD_MASTER_BENAR){
     simpanLoginBersih({username:"master", nama:"Master", role:"Admin/Owner", isMaster: true});
     alert("✅ Login Master berhasil beb!");
     window.location = "dashboard.html";
   } else {
-    alert("❌ Master Key / Password salah beb!\n\nYang bener:\nMASTER KEY = mid241195\nPASSWORD = 19032014\n\nYang Bapak ketik tadi:\nKey = " + key + "\nPass = " + pass);
+    alert("❌ Master Key / Password salah beb!");
   }
 }
 </script>
