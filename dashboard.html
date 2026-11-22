@@ -90,7 +90,7 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 </div>
 <div class="navbar">
 <a href="dashboard.html" class="active">Dashboard</a>
-<a href="mobil.html">Data Armada</a>
+<a href="mobil.html">Data Motor</a>
 <a href="transaksi.html">Transaksi</a>
 <a href="customer.html">Customer Kredit</a>
 <a href="custreg.html">Customer Reguler</a>
@@ -102,12 +102,12 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 <div class="container">
 <div class="slider" id="sliderMobil"><div class="slides" id="slidesContainer"></div><button class="prev" onclick="geserSlide(-1)">❮</button><button class="next" onclick="geserSlide(1)">❯</button><div class="dots" id="dotsContainer"></div></div>
 <div class="box">
-<div class="card-grid"><div class="card"><h4>TOTAL ARMADA</h4><h2 id="total_mobil">0</h2></div><div class="card"><h4>STATUS ADA</h4><h2 id="mobil_ada">0</h2></div><div class="card"><h4>STATUS KELUAR</h4><h2 id="mobil_keluar">0</h2></div><div class="card"><h4>TOTAL TRANSAKSI</h4><h2 id="trx_total">0</h2></div></div>
-<div class="info-armada"><div class="info-card"><span>🚗 Mobil Tersedia Hari Ini</span><span id="mobil_tersedia">0 Unit</span></div><div class="info-card"><span>📅 Mobil Disewa Bulan Ini</span><span id="mobil_disewa_bulan">0 Unit</span></div></div>
+<div class="card-grid"><div class="card"><h4>TOTAL MOTOR</h4><h2 id="total_mobil">0</h2></div><div class="card"><h4>STATUS ADA</h4><h2 id="mobil_ada">0</h2></div><div class="card"><h4>STATUS KELUAR</h4><h2 id="mobil_keluar">0</h2></div><div class="card"><h4>TOTAL TRANSAKSI</h4><h2 id="trx_total">0</h2></div></div>
+<div class="info-armada"><div class="info-card"><span>🏍️ Motor Tersedia Hari Ini</span><span id="mobil_tersedia">0 Unit</span></div><div class="info-card"><span>📅 Motor Disewa Bulan Ini</span><span id="mobil_disewa_bulan">0 Unit</span></div></div>
 <p id="statusFirebase" style="text-align:center;font-size:11px;font-weight:bold;white-space:pre-wrap">⏳ Menghubungkan ke Firebase rental2026 + Fonnte...</p>
 <h3 class="menu-title">MENU UTAMA</h3>
 <div class="menu-grid">
-<div class="menu-item" onclick="window.location='mobil.html'"><img src="https://cdn-icons-png.flaticon.com/512/1076/1076965.png"><h3>Data Armada</h3></div>
+<div class="menu-item" onclick="window.location='mobil.html'"><img src="https://cdn-icons-png.flaticon.com/512/1076/1076965.png"><h3>Data Motor</h3></div>
 <div class="menu-item" onclick="window.location='transaksi.html'"><img src="https://cdn-icons-png.flaticon.com/512/2821/2821001.png"><h3>Transaksi Sewa</h3></div>
 <div class="menu-item" onclick="window.location='customer.html'"><img src="https://cdn-icons-png.flaticon.com/512/219/219983.png"><h3>Customer Kredit</h3></div>
 <div class="menu-item" onclick="window.location='laporan.html'"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"><h3>Laporan</h3></div>
@@ -118,7 +118,7 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
 </div>
 <div class="backup-box" id="backupSection">
   <h3 style="margin:0 0 5px 0;color:#15803d;">💾 BACKUP / LIHAT DATA BACKUP - ANTI DOUBLE + WARNING 1 LAYAR</h3>
-  <p style="font-size:12px;color:#64748b;margin:0 0 10px 0;">Restore cuma nambah yang hilang aja beb. Data baru tidak tertimpa, tidak double. Contoh: Backup 10, data jadi 12, restore tetap 12.</p>
+  <p style="font-size:12px;color:#64748b;margin:0 0 10px 0;">Backup sekarang = Download JSON beb (aman, ga kena limit 1 MB). Restore cuma nambah yang hilang aja beb. Data baru tidak tertimpa, tidak double.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;">
     <button class="btn-backup btn-hijau" onclick="buatBackup()">📥 Backup Sekarang</button>
     <button class="btn-backup btn-biru" onclick="loadBackupList()">👀 Lihat Backup</button>
@@ -127,7 +127,7 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
     <button class="btn-backup" style="background:#f59e0b;color:#fff;" onclick="document.getElementById('fileRestore').click()">📂 Restore dari File JSON</button>
   </div>
   <p id="statusBackup" style="font-size:12px;font-weight:700;color:#15803d;margin:10px 0 0 0;"></p>
-  <table class="backup-table" id="tabelBackup" style="display:none;"><thead><tr><th>Tanggal Backup</th><th>Armada</th><th>Transaksi</th><th>User</th><th>Aksi</th></tr></thead><tbody></tbody></table>
+  <table class="backup-table" id="tabelBackup" style="display:none;"><thead><tr><th>Tanggal Backup</th><th>Motor</th><th>Transaksi</th><th>User</th><th>Aksi</th></tr></thead><tbody></tbody></table>
   <div id="backupDetail"></div>
 </div>
 <div class="master-box" id="boxLihatPassword" style="display:none;">
@@ -137,7 +137,7 @@ body{font-family:'Segoe UI',Arial;background:linear-gradient(135deg,#0a1629 0%,#
   <div id="daftarUser"></div>
 </div>
 </div>
-<h3 class="katalog-title">KATALOG ARMADA KAMI - rental2026</h3>
+<h3 class="katalog-title">KATALOG MOTOR KAMI - rental2026</h3>
 <div class="katalog-grid" id="katalogContainer"></div>
 </div>
 <div class="modal-bg" id="modalRestore" onclick="if(event.target===this) tutupModalRestore()">
@@ -184,21 +184,20 @@ let backupTerakhir = null;
 let restoreYangDipilih = null;
 let cachePassDashboard = {};
 document.getElementById('tgl_sekarang').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-// CEK MASTER STRICT BEB - CUMA BACA apama_user, GAK SCAN-SCAN LAGI
-// Jadi login Doden -> isMaster false -> kotak ungu ke-hide. Login Master -> isMaster true -> kotak nongol.
 function getUserLogin(){
   try{ return JSON.parse(localStorage.getItem("apama_user") || "{}"); }catch(e){ return {}; }
 }
 window.addEventListener('load', function(){
   let user = getUserLogin();
   let box = document.getElementById('boxLihatPassword');
-  if(user.isMaster === true){ if(box) box.style.display = "block"; }
+  let isMasterDash = (user.isMaster === true || String(user.username||"").toLowerCase() === "master");
+  if(isMasterDash){ if(box) box.style.display = "block"; }
   else { if(box) box.style.display = "none"; }
 });
 async function lihatUserTerdaftar(){
   let user = getUserLogin();
-  if(user.isMaster !== true){ alert("Maaf beb, cuma Master yang boleh lihat!"); return; }
+  let isMasterDash2 = (user.isMaster === true || String(user.username||"").toLowerCase() === "master");
+  if(!isMasterDash2){ alert("Maaf beb, cuma Master yang boleh lihat!"); return; }
   let tempat = document.getElementById('daftarUser');
   tempat.innerHTML = "⏳ Lagi ngeload beb...";
   try{
@@ -234,7 +233,7 @@ function renderAll(){
   let bulanIni=new Date().getMonth(); let tahunIni=new Date().getFullYear();
   let mobilDisewaBulan=dataTransaksi.filter(t=>{let d=new Date(t.tgl_sewa||t.created_at); return d.getMonth()==bulanIni && d.getFullYear()==tahunIni;}).length;
   document.getElementById('mobil_disewa_bulan').innerText=mobilDisewaBulan+' Unit';
-  document.getElementById('statusFirebase').innerText = `✅ FIREBASE: ${totalArmada} armada | ${dataTransaksi.length} transaksi | ${dataUser.length} user | Slide: ${slideIndex} | Group: ${GROUP_ID_RENTAL_APAMA || 'Belum set'}`;
+  document.getElementById('statusFirebase').innerText = `✅ FIREBASE: ${totalArmada} motor | ${dataTransaksi.length} transaksi | ${dataUser.length} user | Slide: ${slideIndex} | Group: ${GROUP_ID_RENTAL_APAMA || 'Belum set'}`;
   document.getElementById('statusFirebase').style.color = 'green';
   if(!sliderSudahRender || document.querySelectorAll('.slide').length !== totalArmada){ renderSlider(); sliderSudahRender = true; }
   renderKatalog();
@@ -242,15 +241,15 @@ function renderAll(){
 function renderSlider(){
   let slidesContainer=document.getElementById('slidesContainer');
   let dotsContainer=document.getElementById('dotsContainer');
-  if(dataMobil.length==0){document.getElementById('sliderMobil').innerHTML='<div style="text-align:center;padding:80px;color:#d4af37;">Belum ada data armada</div>';return;}
+  if(dataMobil.length==0){document.getElementById('sliderMobil').innerHTML='<div style="text-align:center;padding:80px;color:#d4af37;">Belum ada data motor</div>';return;}
   slidesContainer.innerHTML=''; dotsContainer.innerHTML='';
   dataMobil.forEach((m,i)=>{
     let foto=m.foto||'https://placehold.co/600x380/0a1629/d4af37?text=No+Foto';
     let harga=parseInt(m.harga||0).toLocaleString('id-ID');
-    let namaMobil=`${m.merk||''} ${m.type||''} ${m.tahun||''}`;
+    let namaMotor=`${m.merk||''} ${m.type||''} ${m.tahun||''}`;
     let isKeluar=String(m.status||'ADA').toUpperCase()==='KELUAR';
-    let btnBookingHtml=isKeluar?`<button class="btn-wa" disabled>⛔ SEDANG DISEWA</button>`:`<button class="btn-wa btnBooking" data-nama="${namaMobil}" data-harga="${m.harga}" data-plat="${m.plat}">📱 BOOKING VIA WHATSAPP</button>`;
-    slidesContainer.innerHTML+=`<div class="slide"><div class="slide-img"><img src="${foto}"></div><div class="slide-info"><div><h3>${namaMobil}</h3><span class="plat">${m.plat||'-'}</span> ${getStatus(m.status)}<div class="detail-grid"><span>Tahun</span><span>${m.tahun||'-'}</span><span>Warna</span><span>${m.warna||'-'}</span><span>CC</span><span>${m.cc||'-'} CC</span><span>Penumpang</span><span>${m.penumpang||'-'} Orang</span></div></div><div><div class="harga-box"><div>HARGA SEWA / HARI</div><div class="value">Rp ${harga}</div></div>${btnBookingHtml}</div></div></div>`;
+    let btnBookingHtml=isKeluar?`<button class="btn-wa" disabled>⛔ SEDANG DISEWA</button>`:`<button class="btn-wa btnBooking" data-nama="${namaMotor}" data-harga="${m.harga}" data-plat="${m.plat}">📱 BOOKING VIA WHATSAPP</button>`;
+    slidesContainer.innerHTML+=`<div class="slide"><div class="slide-img"><img src="${foto}"></div><div class="slide-info"><div><h3>${namaMotor}</h3><span class="plat">${m.plat||'-'}</span> ${getStatus(m.status)}<div class="detail-grid"><span>Tahun</span><span>${m.tahun||'-'}</span><span>Warna</span><span>${m.warna||'-'}</span><span>CC</span><span>${m.cc||'-'} CC</span><span>Penumpang</span><span>${m.penumpang||'-'} Orang</span></div></div><div><div class="harga-box"><div>HARGA SEWA / HARI</div><div class="value">Rp ${harga}</div></div>${btnBookingHtml}</div></div></div>`;
     dotsContainer.innerHTML+=`<span class="dot" onclick="currentSlide(${i+1})"></span>`;
   });
   showSlides(slideIndex);
@@ -279,6 +278,17 @@ function showSlides(n){
   dots.forEach(d=>d.classList.remove("active")); if(dots[slideIndex-1]) dots[slideIndex-1].classList.add("active");
 }
 setInterval(()=>{geserSlide(1)},6000);
+
+// ===== FIX BACKUP BEB - ANTI 1 MB, TETEP PAKE CONFIG LAMA rental2026 =====
+function buangFotoBeb(obj){
+  if(!obj || typeof obj !== 'object') return obj;
+  let o = {...obj};
+  // Semua field foto / base64 dibuang, yang bikin 3,2 MB beb. Data asli di Firestore TETEP aman beb!
+  ['foto','foto_mobil','bukti','ktp_foto','foto_ktp','foto_sim','gambar','image','base64'].forEach(k=>{ if(k in o) o[k]=''; });
+  // Kalau ada field yang isinya data:image (base64 panjang), buang juga
+  Object.keys(o).forEach(k=>{ if(typeof o[k]==='string' && o[k].length>5000 && o[k].includes('data:image')) o[k]=''; });
+  return o;
+}
 async function buatBackup(){
   document.getElementById('statusBackup').innerText = "⏳ Membuat backup...";
   try{
@@ -288,14 +298,24 @@ async function buatBackup(){
     let armada = []; armadaSnap.forEach(d=>armada.push({id:d.id, ...d.data()}));
     let trx = []; trxSnap.forEach(d=>trx.push({id:d.id, ...d.data()}));
     let users = []; userSnap.forEach(d=>users.push({id:d.id, ...d.data()}));
+    // BEB, BUANG FOTO DULU - INI YANG BIKIN 3,2 MB!
+    armada = armada.map(buangFotoBeb);
+    trx = trx.map(buangFotoBeb);
+    users = users.map(buangFotoBeb);
     let backup = { tanggal: new Date().toLocaleString('id-ID'), timestamp: Date.now(), armada_mobil: armada, transaksi: trx, users: users, total_armada: armada.length, total_transaksi: trx.length, total_user: users.length };
     backupTerakhir = backup;
-    await db.collection("backups").add(backup);
-    let listLocal = JSON.parse(localStorage.getItem("apama_backups")||"[]");
-    listLocal.unshift(backup);
-    localStorage.setItem("apama_backups", JSON.stringify(listLocal.slice(0,20)));
+    // BEB, JANGAN SIMPAN FULL KE FIRESTORE - ITU YANG BIKIN ERROR 1 MB!
+    // Cuma simpan META kecil aja ke Firestore, data full langsung DOWNLOAD JSON beb!
+    try{
+      await db.collection("backups").add({ tanggal: backup.tanggal, timestamp: backup.timestamp, total_armada: backup.total_armada, total_transaksi: backup.total_transaksi, total_user: backup.total_user, tipe: "meta-json-download" });
+    }catch(e){ /* kalau meta gagal, biarin beb, JSON udah ke-download */ }
+    try{
+      let listLocal = JSON.parse(localStorage.getItem("apama_backups")||"[]");
+      listLocal.unshift(backup);
+      localStorage.setItem("apama_backups", JSON.stringify(listLocal.slice(0,3)));
+    }catch(e){ /* localStorage penuh, biarin beb */ }
     downloadJSON(backup, "backup-apama-" + new Date().toISOString().slice(0,10) + ".json");
-    document.getElementById('statusBackup').innerText = `✅ Backup berhasil! ${armada.length} armada | ${trx.length} transaksi | ${users.length} user - Tersimpan di Firestore + ter-download JSON beb!`;
+    document.getElementById('statusBackup').innerText = `✅ Backup berhasil! ${armada.length} motor | ${trx.length} transaksi | ${users.length} user - File JSON udah ke-download beb! Data asli di rental2026 AMAN beb!`;
     loadBackupList();
   }catch(e){ document.getElementById('statusBackup').innerText = "❌ Gagal backup: " + e.message; }
 }
@@ -317,28 +337,47 @@ async function loadBackupList(){
   let tbody = document.querySelector("#tabelBackup tbody");
   tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>⏳ Memuat backup...</td></tr>";
   try{
+    // Coba dari Firestore (meta kecil) + localStorage
+    let listLocal = JSON.parse(localStorage.getItem("apama_backups")||"[]");
     let snap = await db.collection("backups").orderBy("timestamp","desc").limit(10).get();
-    if(snap.empty){ tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;color:#ef4444;'>Belum ada backup di Firestore beb. Klik Backup Sekarang dulu.</td></tr>"; return; }
+    if(snap.empty && listLocal.length===0){ tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;color:#15803d;'>Belum ada backup beb. Klik Backup Sekarang, file JSON langsung ke-download beb!</td></tr>"; return; }
     let html = "";
+    if(listLocal.length>0){
+      listLocal.forEach((b,i)=>{
+        html += `<tr><td>${b.tanggal||'-'} (Lokal)</td><td>${b.total_armada||0}</td><td>${b.total_transaksi||0}</td><td>${b.total_user||0}</td><td><button class="btn-backup btn-ungu" style="padding:5px 10px;" onclick="exportBackupJSON()">⬇️ Download</button> <button class="btn-backup btn-hijau" style="padding:5px 10px;" onclick="restoreDariLocal(${i})">♻️ Restore</button></td></tr>`;
+      });
+    }
     snap.forEach(doc=>{
       let b = doc.data();
-      html += `<tr><td>${b.tanggal||'-'}</td><td>${b.total_armada||0}</td><td>${b.total_transaksi||0}</td><td>${b.total_user||0}</td><td><button class="btn-backup btn-biru" style="padding:5px 10px;" onclick="lihatDetailBackup('${doc.id}')">👀 Lihat</button> <button class="btn-backup btn-hijau" style="padding:5px 10px;" onclick="restoreBackup('${doc.id}')">♻️ Restore</button></td></tr>`;
+      html += `<tr><td>${b.tanggal||'-'}</td><td>${b.total_armada||0}</td><td>${b.total_transaksi||0}</td><td>${b.total_user||0}</td><td><span style="font-size:11px;color:#64748b;">Meta aja beb - Restore pake File JSON</span></td></tr>`;
     });
     tbody.innerHTML = html;
-    document.getElementById('statusBackup').innerText = "✅ Ketemu " + snap.size + " backup di Firestore beb.";
+    document.getElementById('statusBackup').innerText = "✅ Backup ketemu beb. Backup full ada di File JSON Download beb.";
   }catch(e){ tbody.innerHTML = "<tr><td colspan='5'>❌ " + e.message + "</td></tr>"; }
 }
+function restoreDariLocal(i){
+  let listLocal = JSON.parse(localStorage.getItem("apama_backups")||"[]");
+  if(!listLocal[i]) return;
+  restoreYangDipilih = {tipe:'file', data: listLocal[i], namaFile: 'backup-lokal'};
+  bukaModalWarning(listLocal[i], "Backup Lokal");
+}
 async function lihatDetailBackup(id){
+  // Backup lama di Firestore mungkin masih full, backup baru cuma meta
   let doc = await db.collection("backups").doc(id).get();
   let b = doc.data();
   let el = document.getElementById('backupDetail');
   el.style.display = "block";
-  el.innerText = "BACKUP TANGGAL: " + b.tanggal + "\n\nARMADA (" + b.total_armada + "):\n" + b.armada_mobil.map(m=>"- " + (m.merk||'') + " " + (m.type||'') + " | Plat: " + (m.plat||'-') + " | " + (m.status||'')).join("\n") + "\n\nTRANSAKSI (" + b.total_transaksi + "):\n" + b.transaksi.slice(0,10).map(t=>"- " + JSON.stringify(t).slice(0,120)).join("\n") + "\n\nUSER (" + b.total_user + "):\n" + b.users.map(u=>"- " + u.username + " / " + u.nama + " (" + u.role + ")").join("\n");
+  if(b.armada_mobil){
+    el.innerText = "BACKUP TANGGAL: " + b.tanggal + "\n\nMOTOR (" + b.total_armada + "):\n" + b.armada_mobil.map(m=>"- " + (m.merk||'') + " " + (m.type||'') + " | Plat: " + (m.plat||'-') + " | " + (m.status||'')).join("\n") + "\n\nTRANSAKSI (" + b.total_transaksi + "):\n" + (b.transaksi||[]).slice(0,10).map(t=>"- " + JSON.stringify(t).slice(0,120)).join("\n");
+  } else {
+    el.innerText = "BACKUP TANGGAL: " + b.tanggal + "\nMeta aja beb. Data full ada di File JSON yang Bapak download pas Backup Sekarang beb.\n\nMOTOR: " + b.total_armada + " | TRANSAKSI: " + b.total_transaksi + " | USER: " + b.total_user;
+  }
   el.scrollIntoView({behavior:'smooth'});
 }
 async function restoreBackup(id){
   let doc = await db.collection("backups").doc(id).get();
   let b = doc.data();
+  if(!b.armada_mobil){ alert("Backup ini cuma meta beb! Restore pake File JSON yang Bapak download ya beb - klik Restore dari File JSON."); return; }
   restoreYangDipilih = {tipe:'firestore', id:id, data:b};
   bukaModalWarning(b, "Firestore");
 }
@@ -354,8 +393,8 @@ async function siapkanRestoreFile(event){
 function bukaModalWarning(b, sumber){
   document.getElementById('isiWarningRestore').innerHTML = `
     <b>📦 Backup:</b> ${sumber} | ${b.tanggal || '-'}<br>
-    Isi Backup: <b>${b.total_armada||0} Armada | ${b.total_transaksi||0} Transaksi | ${b.total_user||0} User</b><br>
-    <b>📊 Sekarang:</b> <b>${dataMobil.length} Armada | ${dataTransaksi.length} Transaksi | ${dataUser.length} User</b>
+    Isi Backup: <b>${b.total_armada||0} Motor | ${b.total_transaksi||0} Transaksi | ${b.total_user||0} User</b><br>
+    <b>📊 Sekarang:</b> <b>${dataMobil.length} Motor | ${dataTransaksi.length} Transaksi | ${dataUser.length} User</b>
   `;
   document.getElementById('cekSetuju').checked = false;
   document.getElementById('ketikRestore').value = "";
@@ -427,9 +466,9 @@ async function getGroupIdRentalApama(){
 document.addEventListener('click', async function(e){
   if(e.target&&e.target.classList.contains('btnBooking')){
     if(e.target.disabled) return; e.preventDefault();
-    const btn=e.target; const namaMobil=btn.getAttribute('data-nama'); const harga=btn.getAttribute('data-harga'); const plat=btn.getAttribute('data-plat');
-    const tgl=prompt(`Booking ${namaMobil}\nPlat: ${plat}\nMau sewa tanggal berapa?`); if(!tgl) return;
-    const pesan=`🔔 BOOKING BARU MASUK!\n\nMobil: ${namaMobil}\nPlat: ${plat}\nHarga: Rp${Number(harga).toLocaleString('id-ID')}/hari\nTanggal Sewa: ${tgl}\nSumber: APAMA RENTAL\nGroup: Rental Apama HZ8HAZkVT2sChPO7j5jjq2`;
+    const btn=e.target; const namaMotor=btn.getAttribute('data-nama'); const harga=btn.getAttribute('data-harga'); const plat=btn.getAttribute('data-plat');
+    const tgl=prompt(`Booking ${namaMotor}\nPlat: ${plat}\nMau sewa tanggal berapa?`); if(!tgl) return;
+    const pesan=`🔔 BOOKING BARU MASUK!\n\nMotor: ${namaMotor}\nPlat: ${plat}\nHarga: Rp${Number(harga).toLocaleString('id-ID')}/hari\nTanggal Sewa: ${tgl}\nSumber: APAMA RENTAL\nGroup: Rental Apama HZ8HAZkVT2sChPO7j5jjq2`;
     try{
       let fd1=new FormData(); fd1.append("target", NOMOR_WA_ADMIN); fd1.append("message", pesan);
       await fetch(URL_SEND, {method:"POST", headers:{Authorization: WA_TOKEN}, body: fd1});
